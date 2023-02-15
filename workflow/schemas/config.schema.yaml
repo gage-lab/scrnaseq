@@ -20,6 +20,53 @@ properties:
   use_IRescue:
     type: boolean
     description: whether to use IRescue to quantify TE expression
+  preprocess:
+    type: object
+    description: parameters for preprocessing the data
+    required:
+      - empty
+      - lowexp
+      - low_quality
+    properties:
+      empty:
+        type: object
+        description: parameters for filtering empty droplets
+        required:
+          - min_genes
+        properties:
+          min_genes:
+            type: integer
+            description: minimum number of genes detected in an empty droplet
+      lowexp:
+        type: object
+        description: parameters for filtering lowly expressed cells
+        required:
+          - min_cells
+        properties:
+          min_cells:
+            type: integer
+            description: minimum number of cells expressing a gene
+      low_quality:
+        type: object
+        description: parameters for filtering low quality cells
+        required:
+          - activate
+          - min_counts
+          - max_pct_mt
+          - min_genes
+        properties:
+          activate:
+            type: boolean
+            description: whether to activate the filtering
+          min_counts:
+            type: integer
+            description: minimum number of counts in a cell
+          max_pct_mt:
+            type: number
+            description: maximum percentage of mitochondrial counts in a cell
+          min_genes:
+            type: integer
+            description: minimum number of genes detected in a cell
 
 required:
   - outdir
@@ -27,3 +74,4 @@ required:
   - patientsheet
   - use_CellBender
   - use_IRescue
+  - preprocess

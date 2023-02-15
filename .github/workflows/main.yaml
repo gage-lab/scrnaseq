@@ -64,5 +64,4 @@ jobs:
           --directory .test \
           --cores 2 \
           --show-failed-logs \
-          --conda-cleanup-pkgs cache \
-          --all-temp
+          --conda-cleanup-pkgs cache

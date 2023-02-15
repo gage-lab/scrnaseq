@@ -4,3 +4,14 @@ patientsheet: config/patientsheet.tsv
 
 use_CellBender: false
 use_IRescue: true
+
+preprocess:
+  empty:
+    min_genes: 200
+  lowexp:
+    min_cells: 3
+  low_quality:
+    activate: False
+    min_counts: 1000
+    max_pct_mt: 5
+    min_genes: 100
