@@ -33,22 +33,13 @@ istest = True if "ngs-test-data" in runs.r1[0] else False
 # include rules in other files
 include: "rules/ref.smk"
 include: "rules/map_count.smk"
-
-
-# define final output based on config values
-if config["use_IRescue"]:
-    final = rules.IRescue.output
-elif config["use_CellBender"] and not config["use_IRescue"]:
-    final = rules.CellBender.output
-elif not config["use_CellBender"] and not config["use_IRescue"]:
-    final = rules.STARsolo.output
+include: "rules/preprocess.smk"
 
 
 rule all:
     input:
         expand(
-            final,
-            run=runs["run_id"],
+            rules.filter.output,
             features=["Gene", "GeneFull"],
             outdir=config["outdir"],
         ),

@@ -1,0 +1,14 @@
+channels:
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - scanpy>=1.7.2
+  - mudata>=0.2.1
+  - matplotlib==3.6 # needed to avoid TypeError in scanpy
+  - jupyter
+  - jupyterlab_code_formatter
+  - nbconvert
+  - pip
+  - pip:
+      - scrublet
