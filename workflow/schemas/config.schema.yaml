@@ -1,0 +1,24 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+
+description: snakemake configuration file
+
+type: object
+
+properties:
+  outdir:
+    type: string
+  runsheet:
+    type: string
+  patientsheet:
+    type: string
+  use_CellBender:
+    type: boolean
+  use_IRescue:
+    type: boolean
+
+required:
+  - outdir
+  - runsheet
+  - patientsheet
+  - use_CellBender
+  - use_IRescue

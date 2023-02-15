@@ -1,0 +1,23 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+
+description: an entry in the sample sheet
+
+properties:
+  run_id:
+    type: string
+    description: 10x run identifier
+  patient_id:
+    type: string
+    description: patient identifier
+  r1:
+    type: string
+    description: file path to read 1 fastq file
+  r2:
+    type: string
+    description: file path to read 2 fastq file
+
+required:
+  - run_id
+  - patient_id
+  - r1
+  - r2

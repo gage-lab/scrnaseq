@@ -1,0 +1,13 @@
+$schema: "https://json-schema.org/draft/2020-12/schema"
+
+description: an entry in the tissue sheet
+
+properties:
+  patient_id:
+    type: string
+    description: patient identifier
+  condition:
+    type: string
+
+required:
+  - patient_id

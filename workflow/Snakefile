@@ -6,18 +6,25 @@
 import os
 import pandas as pd
 from snakemake.utils import min_version
+from snakemake.utils import validate
 
 ##### set minimum snakemake version #####
 min_version("7.16.0")
 
 
-# define configfile
+# define configfile, validate
 configfile: "config/config.yaml"
 
 
-# get samplesheet
+validate(config, "schemas/config.schema.yaml")
+
+# load runsheet, validate
 runs = pd.read_csv(config["runsheet"], sep="\t")
+validate(runs, "schemas/runsheet.schema.yaml")
+
+# load patientsheet, validate
 patients = pd.read_csv(config["patientsheet"], sep="\t")
+validate(patients, "schemas/patientsheet.schema.yaml")
 
 # indicator variable for if this run is a test or not
 istest = True if "ngs-test-data" in runs.r1[0] else False
