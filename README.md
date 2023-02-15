@@ -1,19 +1,16 @@
-# Snakemake workflow: `<name>`
+# scRNA-seq workflow for 10x data
 
 [![Snakemake](https://img.shields.io/badge/snakemake-≥7.16.0-brightgreen.svg)](https://snakemake.github.io)
-[![GitHub actions status](https://github.com/<owner>/<repo>/workflows/Tests/badge.svg?branch=main)](https://github.com/<owner>/<repo>/actions?query=branch%3Amain+workflow%3ATests)
-
-A Snakemake workflow for `<description>`
+[![GitHub actions status](https://github.com/gage-lab/scrnaseq/workflows/Tests/badge.svg?branch=main)](https://github.com/gage-lab/scrnaseq/actions?query=branch%3Amain+workflow%3ATests)
 
 ## Usage
 
+```bash
+# generate 10x v3 scRNA-seq test data
+snakemake scrnaseq_10x_v3 --use-conda -c1 --conda-cleanup-pkgs cache
+
+# test the workflow
+snakemake all --use-conda -c1 --directory .test
+```
+
 ## Development
-
-## TODO
-
-- Install dependencies: `conda env create -f environment.yml -n <name>`
-- Activate the environment: `conda activate <name>`
-- Install precommits: `pre-commit install`
-- Replace `<owner>` and `<repo>` everywhere in the template (also under .github/workflows) with the correct `<repo>` name and owning user or organization.
-- Replace `<name>` with the workflow name (can be the same as `<repo>`).
-- Replace `<description>` with a description of what the workflow does.

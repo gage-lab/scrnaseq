@@ -3,7 +3,45 @@
 # https://snakemake.readthedocs.io/en/stable/snakefiles/best_practices.html,
 # in particular regarding the standardized folder structure mentioned there.
 
+import os
+import pandas as pd
 from snakemake.utils import min_version
 
 ##### set minimum snakemake version #####
 min_version("7.16.0")
+
+
+# define configfile
+configfile: "config/config.yaml"
+
+
+# get samplesheet
+runs = pd.read_csv(config["runsheet"], sep="\t")
+patients = pd.read_csv(config["patientsheet"], sep="\t")
+
+# indicator variable for if this run is a test or not
+istest = True if "ngs-test-data" in runs.r1[0] else False
+
+
+# include rules in other files
+include: "rules/ref.smk"
+include: "rules/map_count.smk"
+
+
+# define final output based on config values
+if config["use_IRescue"]:
+    final = rules.IRescue.output
+elif config["use_CellBender"] and not config["use_IRescue"]:
+    final = rules.CellBender.output
+elif not config["use_CellBender"] and not config["use_IRescue"]:
+    final = rules.STARsolo.output
+
+
+rule all:
+    input:
+        expand(
+            final,
+            run=runs["run_id"],
+            features=["Gene", "GeneFull"],
+            outdir=config["outdir"],
+        ),

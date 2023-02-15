@@ -1,0 +1,3 @@
+run_id	patient_id	r1	r2
+a	a	ngs-test-data/scrnaseq_10x_v3/a.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/a.chr21_R2.fastq.gz
+b	b	ngs-test-data/scrnaseq_10x_v3/b.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/b.chr21_R2.fastq.gz
