@@ -2,19 +2,11 @@
 def get_filter_input(wildcards):
     i = dict()
     if config["use_CellBender"]:
-        i["CellBender"] = expand(
-            rules.CellBender.output.filtered, run=runs["run_id"], allow_missing=True
-        )
+        i["CellBender"] = rules.CellBender.output.filtered
     else:
-        i["STARsolo"] = expand(
-            "{outdir}/map_count/{run}/outs{features}/filtered/matrix.mtx",
-            run=runs["run_id"],
-            allow_missing=True,
-        )
+        i["STARsolo"] = "{outdir}/map_count/{run}/outs{features}/filtered/matrix.mtx"
     if config["use_IRescue"]:
-        i["IRescue"] = expand(
-            rules.IRescue.output, run=runs["run_id"], allow_missing=True
-        )
+        i["IRescue"] = rules.IRescue.output
     return i
 
 
@@ -23,10 +15,10 @@ rule filter:
     input:
         unpack(get_filter_input),
     output:
-        "{outdir}/preprocess/{features}/filtered.h5mu",
+        "{outdir}/preprocess/{run}/{features}/filtered.h5mu",
     conda:
         "../envs/scanpy.yaml"
     log:
-        notebook="{outdir}/preprocess/{features}/filter_report.ipynb",
+        notebook="{outdir}/preprocess/{run}/{features}/filter_report.ipynb",
     notebook:
         "../notebooks/filter.py.ipynb"

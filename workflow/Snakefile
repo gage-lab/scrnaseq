@@ -22,6 +22,7 @@ validate(config, "schemas/config.schema.yaml")
 runs = pd.read_csv(config["runsheet"], sep="\t")
 validate(runs, "schemas/runsheet.schema.yaml")
 
+
 # load patientsheet, validate
 patients = pd.read_csv(config["patientsheet"], sep="\t")
 validate(patients, "schemas/patientsheet.schema.yaml")
@@ -40,6 +41,7 @@ rule all:
     input:
         expand(
             rules.filter.output,
+            run=runs["run_id"],
             features=["Gene", "GeneFull"],
             outdir=config["outdir"],
         ),
