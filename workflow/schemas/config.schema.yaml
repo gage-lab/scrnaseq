@@ -7,14 +7,19 @@ type: object
 properties:
   outdir:
     type: string
+    description: path to the output directory (does not need to exist)
   runsheet:
     type: string
+    description: path to the runsheet
   patientsheet:
     type: string
+    description: path to the patientsheet
   use_CellBender:
     type: boolean
+    description: whether to use CellBender to correct the 10x data
   use_IRescue:
     type: boolean
+    description: whether to use IRescue to quantify TE expression
 
 required:
   - outdir

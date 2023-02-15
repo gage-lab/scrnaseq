@@ -8,6 +8,7 @@ properties:
     description: patient identifier
   condition:
     type: string
+    description: condition of the patient
 
 required:
   - patient_id
