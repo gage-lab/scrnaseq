@@ -46,12 +46,10 @@ jobs:
       - name: Install Mamba
         uses: conda-incubator/setup-miniconda@v2
         with:
-          miniforge-variant: Mamabaforge
+          miniforge-variant: Mamabaforge-pypy3
           miniforge-version: latest
           use-mamba: true
           python-version: 3.9
-          channels: conda-forge,bioconda,nodefaults
-          channel-priority: strict
           environment-file: environment.yaml
       - name: Generate test data
         run: cd .test/ngs-test-data && snakemake scrnaseq_10x_v3 --use-conda --cores 2 --conda-cleanup-pkgs cache
