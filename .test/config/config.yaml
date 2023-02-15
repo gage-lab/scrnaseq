@@ -3,4 +3,4 @@ runsheet: config/runsheet.tsv
 patientsheet: config/patientsheet.tsv
 
 use_CellBender: false
-use_IRescue: false
+use_IRescue: true

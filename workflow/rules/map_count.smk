@@ -66,7 +66,7 @@ rule STARsolo:
     conda:
         "../envs/star.yaml"
     params:
-        soloUMIlen=12,  # for 10x v3 chemistry
+        soloUMIlen=12,  # for 10x v3, use 16 for 10x v2
         soloFeatures="Gene GeneFull",  # Gene=spliced only, GeneFull=spliced and unspliced, and Velocyto=spliced, unspliced, and ambiguous
         soloCellFilter="EmptyDrops_CR",
         soloMultiMappers="EM",
@@ -82,6 +82,7 @@ rule STARsolo:
             --readFilesCommand zcat \
             --soloOutFileNames {params.soloOutFileNames} \
             --soloType CB_UMI_Simple \
+            --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM \
             --soloUMIlen {params.soloUMIlen} \
             --soloCBwhitelist {input.whitelist} \
             --soloFeatures {params.soloFeatures} \
