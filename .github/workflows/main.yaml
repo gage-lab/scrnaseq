@@ -36,7 +36,6 @@ jobs:
         shell: bash -l {0}
     needs:
       - Formatting
-      - Linting
     steps:
       - uses: actions/checkout@v3
         with:
