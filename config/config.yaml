@@ -2,6 +2,15 @@ outdir: results
 runsheet: config/runsheet.tsv
 patientsheet: config/patientsheet.tsv
 
+STARsolo:
+  soloFeatures: # Gene=spliced only, GeneFull=spliced and unspliced, and Velocyto=spliced, unspliced, and ambiguous
+    - Gene
+    - GeneFull
+    - Velocyto
+  outFilterMultimapNmax: 100
+  winAnchorMultimapNmax: 100
+  soloMultiMappers: EM # EM, Uniform, PropUnique, or Rescue
+
 use_CellBender: false
 use_IRescue: true
 

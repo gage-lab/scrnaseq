@@ -2,6 +2,15 @@ outdir: results
 runsheet: config/runsheet.tsv
 patientsheet: config/patientsheet.tsv
 
+STARsolo:
+  soloFeatures:
+    - Gene
+    - GeneFull
+    - Velocyto
+  outFilterMultimapNmax: 100
+  winAnchorMultimapNmax: 100
+  soloMultiMappers: EM
+
 use_CellBender: false
 use_IRescue: true
 

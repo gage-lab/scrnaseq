@@ -25,6 +25,26 @@ rule STARindex:
         "STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {output} --genomeFastaFiles {input.fa} --sjdbGTFfile {input.gtf} --genomeSAindexNbases {params.genomeSAindexNbases}"
 
 
+# setup STARsolo output
+solo_outs = {}
+for f in config["STARsolo"]["soloFeatures"]:
+    for d in ["raw", "filtered"]:
+        if f != "Velocyto":
+            solo_outs[f"{f}_{d}"] = multiext(
+                f"{{outdir}}/map_count/{{run}}/outs{f}/{d}/",
+                "barcodes.tsv",
+                "genes.tsv",
+                "matrix.mtx",
+            )
+        else:
+            solo_outs[f"{f}_{d}"] = multiext(
+                f"{{outdir}}/map_count/{{run}}/outs{f}/{d}/",
+                "ambiguous.mtx",
+                "spliced.mtx",
+                "unspliced.mtx",
+            )
+
+
 # map and count
 # https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md
 rule STARsolo:
@@ -34,30 +54,7 @@ rule STARsolo:
         idx=rules.STARindex.output,
         whitelist=rules.get_whitelist.output,
     output:
-        gene_raw=multiext(
-            "{outdir}/map_count/{run}/outsGene/raw/",
-            "barcodes.tsv",
-            "genes.tsv",
-            "matrix.mtx",
-        ),
-        gene_filtered=multiext(
-            "{outdir}/map_count/{run}/outsGene/filtered/",
-            "barcodes.tsv",
-            "genes.tsv",
-            "matrix.mtx",
-        ),
-        genefull_raw=multiext(
-            "{outdir}/map_count/{run}/outsGeneFull/raw/",
-            "barcodes.tsv",
-            "genes.tsv",
-            "matrix.mtx",
-        ),
-        genefull_filtered=multiext(
-            "{outdir}/map_count/{run}/outsGeneFull/filtered/",
-            "barcodes.tsv",
-            "genes.tsv",
-            "matrix.mtx",
-        ),
+        **solo_outs,
         bam="{outdir}/map_count/{run}/Aligned.sortedByCoord.out.bam",  # if outSAMtype="BAM SortedByCoordinate"
         logs=multiext(
             "{outdir}/map_count/{run}/Log", ".out", ".progress.out", ".final.out"
@@ -67,12 +64,13 @@ rule STARsolo:
         "../envs/star.yaml"
     params:
         soloUMIlen=12,  # for 10x v3, use 16 for 10x v2
-        soloFeatures="Gene GeneFull",  # Gene=spliced only, GeneFull=spliced and unspliced, and Velocyto=spliced, unspliced, and ambiguous
+        soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
         soloCellFilter="EmptyDrops_CR",
-        soloMultiMappers="EM",
+        soloMultiMappers=config["STARsolo"]["soloMultiMappers"],
         outSAMtype="BAM SortedByCoordinate",
         soloOutFileNames="outs genes.tsv barcodes.tsv matrix.mtx",
-        extra="--outFilterMultimapNmax 100 --winAnchorMultimapNmax 100",
+        outFilterMultimapNmax=config["STARsolo"]["outFilterMultimapNmax"],
+        winAnchorMultimapNmax=config["STARsolo"]["winAnchorMultimapNmax"],
     shell:
         """
         STAR \
@@ -89,9 +87,10 @@ rule STARsolo:
             --soloCellFilter {params.soloCellFilter} \
             --soloOutFormatFeaturesGeneField3 "-" \
             --soloMultiMappers {params.soloMultiMappers} \
+            --outFilterMultimapNmax {params.outFilterMultimapNmax} \
+            --winAnchorMultimapNmax {params.winAnchorMultimapNmax} \
             --outSAMtype {params.outSAMtype} \
-            --outFileNamePrefix "$(dirname {output.bam})/" \
-            {params.extra}
+            --outFileNamePrefix "$(dirname {output.bam})/"
 
         # index output
         sambamba index -t {threads} {output.bam}
@@ -106,12 +105,12 @@ rule STARsolo:
 # TODO: provide instructions on how to run this using a GPU
 rule CellBender:
     input:
-        "{outdir}/map_count/{run}/outs{features}/raw/barcodes.tsv",
+        "{outdir}/map_count/{run}/outs{soloFeatures}/raw/barcodes.tsv",
     output:
-        raw="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix.h5",
-        filtered="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix_filtered.h5",
-        pdf="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix.pdf",
-        barcodes="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix_cell_barcodes.csv",
+        raw="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.h5",
+        filtered="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_filtered.h5",
+        pdf="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.pdf",
+        barcodes="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_cell_barcodes.csv",
     params:
         expected_cells=lambda wc: runs.loc[wc.run, "expected_cells"],
         total_droplets_included=lambda wc: runs.loc[wc.run, "total_barcodes"],
@@ -135,10 +134,10 @@ rule IRescue:
         bam=rules.STARsolo.output.bam,
         whitelist=rules.CellBender.output.barcodes
         if config["use_CellBender"]
-        else "{outdir}/map_count/{run}/outs{features}/filtered/barcodes.tsv",
+        else "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/barcodes.tsv",
     output:
         multiext(
-            "{outdir}/map_count/{run}/outs{features}/IRescue/",
+            "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/",
             "barcodes.tsv.gz",
             "features.tsv.gz",
             "matrix.mtx.gz",

@@ -40,11 +40,16 @@ include: "rules/map_count.smk"
 include: "rules/preprocess.smk"
 
 
+# remove Veloctyo from soloFeatures to prevent expansion
+if "Velocyto" in config["STARsolo"]["soloFeatures"]:
+    config["STARsolo"]["soloFeatures"].remove("Velocyto")
+
+
 rule all:
     input:
         expand(
             rules.filter.output,
             run=runs["run_id"],
-            features=["Gene", "GeneFull"],
+            soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),

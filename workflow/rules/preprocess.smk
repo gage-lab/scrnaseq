@@ -4,7 +4,9 @@ def get_filter_input(wildcards):
     if config["use_CellBender"]:
         i["CellBender"] = rules.CellBender.output.filtered
     else:
-        i["STARsolo"] = "{outdir}/map_count/{run}/outs{features}/filtered/matrix.mtx"
+        i[
+            "STARsolo"
+        ] = "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx"
     if config["use_IRescue"]:
         i["IRescue"] = rules.IRescue.output
     return i
@@ -15,11 +17,11 @@ rule filter:
     input:
         unpack(get_filter_input),
     output:
-        "{outdir}/preprocess/{run}/{features}/filtered.h5mu",
+        "{outdir}/preprocess/{run}/{soloFeatures}/filtered.h5mu",
     conda:
         "../envs/scanpy.yaml"
     log:
-        notebook="{outdir}/preprocess/{run}/{features}/filter_report.ipynb",
+        notebook="{outdir}/preprocess/{run}/{soloFeatures}/filter_report.ipynb",
     params:
         expected_multiplet_rate=lambda wc: runs.loc[wc.run, "expected_multiplet_rate"],
     notebook:
