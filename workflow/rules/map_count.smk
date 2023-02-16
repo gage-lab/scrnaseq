@@ -130,7 +130,6 @@ rule CellBender:
 # quantify transposable element expression
 # https://github.com/bodegalab/irescue
 # https://www.biorxiv.org/content/10.1101/2022.09.16.508229v2.full
-# TODO: not working yet
 rule IRescue:
     input:
         bam=rules.STARsolo.output.bam,
