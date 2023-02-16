@@ -1,7 +1,8 @@
 outdir: results
-runsheet: config/runsheet.tsv
-patientsheet: config/patientsheet.tsv
+runsheet: config/runsheet.tsv # one 10x-run per row, with paths to fastq files and cell number information
+patientsheet: config/patientsheet.tsv # one patient per row, with patient-specific information (ie disease-status, age, sex, etc)
 
+# Mapping + Quantification
 STARsolo:
   soloFeatures: # Gene=spliced only, GeneFull=spliced and unspliced, and Velocyto=spliced, unspliced, and ambiguous
     - Gene
@@ -11,9 +12,14 @@ STARsolo:
   winAnchorMultimapNmax: 100
   soloMultiMappers: EM # EM, Uniform, PropUnique, or Rescue
 
+# CellBender is used to remove ambient RNA
+# Runs very slowly without GPU
 use_CellBender: false
+
+# IRescue, uses alignments from STARsolo, is used to quantify TE expression
 use_IRescue: true
 
+# Parameters for filtering empty droplets, low-quanlity cells, and lowly-expressed genes
 preprocess:
   empty:
     min_genes: 200

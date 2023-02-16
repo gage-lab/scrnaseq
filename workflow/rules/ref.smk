@@ -3,7 +3,7 @@ from snakemake.remote import HTTP
 HTTP = HTTP.RemoteProvider()
 
 
-# download reference data from 10x Genomics
+# download reference genome fasta and gene annotation from 10x Genomics
 rule get_refdata:
     input:
         HTTP.remote(
