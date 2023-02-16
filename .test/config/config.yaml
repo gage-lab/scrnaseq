@@ -11,7 +11,7 @@ preprocess:
   lowexp:
     min_cells: 2
   low_quality:
-    activate: True
+    activate: true
     min_counts: 100
     max_pct_mt: 5
     min_genes: 50
