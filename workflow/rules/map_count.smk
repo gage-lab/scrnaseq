@@ -29,8 +29,8 @@ rule STARindex:
 # https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md
 rule STARsolo:
     input:
-        r1=lambda wc: runs.loc[runs["run_id"] == wc.run, "r1"],
-        r2=lambda wc: runs.loc[runs["run_id"] == wc.run, "r2"],
+        r1=lambda wc: runs.loc[wc.run, "r1"],
+        r2=lambda wc: runs.loc[wc.run, "r2"],
         idx=rules.STARindex.output,
         whitelist=rules.get_whitelist.output,
     output:
@@ -103,17 +103,18 @@ rule STARsolo:
 
 # remove ambient RNA and filter empty droplets
 # https://cellbender.readthedocs.io/
+# TODO: provide instructions on how to run this using a GPU
 rule CellBender:
     input:
         "{outdir}/map_count/{run}/outs{features}/raw/barcodes.tsv",
     output:
         raw="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix.h5",
-        pdf="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix.pdf",
         filtered="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix_filtered.h5",
-        barcodes="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix_barcodes.csv",
+        pdf="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix.pdf",
+        barcodes="{outdir}/map_count/{run}/outs{features}/cellbender/feature_bc_matrix_cell_barcodes.csv",
     params:
-        expected_cells=20000,
-        total_droplets_included=100000,
+        expected_cells=lambda wc: runs.loc[wc.run, "expected_cells"],
+        total_droplets_included=lambda wc: runs.loc[wc.run, "total_barcodes"],
     container:
         "docker://us.gcr.io/broad-dsde-methods/cellbender:latest"
     shell:
@@ -129,7 +130,6 @@ rule CellBender:
 # quantify transposable element expression
 # https://github.com/bodegalab/irescue
 # https://www.biorxiv.org/content/10.1101/2022.09.16.508229v2.full
-# TODO: not working yet
 rule IRescue:
     input:
         bam=rules.STARsolo.output.bam,

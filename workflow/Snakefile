@@ -21,13 +21,17 @@ validate(config, "schemas/config.schema.yaml")
 # load runsheet, validate
 runs = pd.read_csv(config["runsheet"], sep="\t")
 validate(runs, "schemas/runsheet.schema.yaml")
+runs.set_index("run_id", inplace=True, drop=False)
 
 # load patientsheet, validate
 patients = pd.read_csv(config["patientsheet"], sep="\t")
 validate(patients, "schemas/patientsheet.schema.yaml")
+patients.set_index("patient_id", inplace=True, drop=False)
 
 # indicator variable for if this run is a test or not
 istest = True if "ngs-test-data" in runs.r1[0] else False
+if istest:
+    print("This is a test run.")
 
 
 # include rules in other files
@@ -40,6 +44,7 @@ rule all:
     input:
         expand(
             rules.filter.output,
+            run=runs["run_id"],
             features=["Gene", "GeneFull"],
             outdir=config["outdir"],
         ),
