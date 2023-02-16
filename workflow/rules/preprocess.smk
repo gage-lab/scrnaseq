@@ -20,5 +20,7 @@ rule filter:
         "../envs/scanpy.yaml"
     log:
         notebook="{outdir}/preprocess/{run}/{features}/filter_report.ipynb",
+    params:
+        multiplet_rate=lambda wc: runs.loc[wc.run, "multiplet_rate"],
     notebook:
         "../notebooks/filter.py.ipynb"
