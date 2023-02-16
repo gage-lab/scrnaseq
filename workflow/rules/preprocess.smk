@@ -1,3 +1,31 @@
+def quant_report_input(wildcards):
+    i = dict()
+    i["STARsolo"] = expand(
+        "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
+        run=runs["run_id"],
+        soloFeatures=config["STARsolo"]["soloFeatures"],
+        allow_missing=True,
+    )
+    # if config["use_CellBender"]:
+    #     i["CellBender"] = rules.CellBender.output.raw
+    # if config["use_IRescue"]:
+    #     i["IRescue"] = rules.IRescue.output
+    return i
+
+
+rule quant_report:
+    input:
+        unpack(quant_report_input),
+    output:
+        "{outdir}/preprocess/quant_report.ipynb",
+    conda:
+        "../envs/scanpy.yaml"
+    log:
+        notebook="{outdir}/preprocess/quant_report.ipynb",
+    notebook:
+        "../notebooks/quant_report.py.ipynb"
+
+
 # define filter input based on config values
 def get_filter_input(wildcards):
     i = dict()

@@ -53,3 +53,7 @@ rule all:
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
+        expand(
+            rules.quant_report.output,
+            outdir=config["outdir"],
+        ),
