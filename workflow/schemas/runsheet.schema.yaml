@@ -24,7 +24,7 @@ properties:
   expected_cells:
     type: integer
     description: number of recovered cells expected
-  multiplet_rate:
+  expected_multiplet_rate:
     type: number
     description: multiplet rate (0-1) (refer to 10x documentation for table of expected multiplet rates)
 
@@ -35,4 +35,4 @@ required:
   - r2
   - total_barcodes
   - expected_cells
-  - multiplet_rate
+  - expected_multiplet_rate
