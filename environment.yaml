@@ -9,3 +9,4 @@ dependencies:
   - pandas
   - biopython
   - pre-commit
+  - gh
