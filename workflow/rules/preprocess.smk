@@ -6,10 +6,22 @@ def quant_report_input(wildcards):
         soloFeatures=config["STARsolo"]["soloFeatures"],
         allow_missing=True,
     )
+    # TODO: add outsVelocyto .. why is it not there?
+    i["STARsoloSummaries"] = expand(
+        "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
+        run=runs["run_id"],
+        soloFeatures=config["STARsolo"]["soloFeatures"],
+        allow_missing=True,
+    )
+    if config["use_IRescue"]:
+        i["IRescue"] = expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/",
+            run=runs["run_id"],
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            allow_missing=True,
+        )
     # if config["use_CellBender"]:
     #     i["CellBender"] = rules.CellBender.output.raw
-    # if config["use_IRescue"]:
-    #     i["IRescue"] = rules.IRescue.output
     return i
 
 
