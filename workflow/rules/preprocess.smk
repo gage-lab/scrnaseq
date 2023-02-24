@@ -1,39 +1,30 @@
-def quant_report_input(wildcards):
-    i = dict()
-    i["STARsolo"] = expand(
-        "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
-        run=runs["run_id"],
-        soloFeatures=config["STARsolo"]["soloFeatures"],
-        allow_missing=True,
-    )
-    # TODO: add outsVelocyto .. why is it not there?
-    i["STARsoloSummaries"] = expand(
-        "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
-        run=runs["run_id"],
-        soloFeatures=config["STARsolo"]["soloFeatures"],
-        allow_missing=True,
-    )
-    if config["use_IRescue"]:
-        i["IRescue"] = expand(
-            "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/",
-            run=runs["run_id"],
-            soloFeatures=config["STARsolo"]["soloFeatures"],
-            allow_missing=True,
-        )
-    # if config["use_CellBender"]:
-    #     i["CellBender"] = rules.CellBender.output.raw
-    return i
+quant_report_input = dict()
+quant_report_input[
+    "STARsoloRaw"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx"
+quant_report_input[
+    "STARsoloFiltered"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx"
+quant_report_input[
+    "STARsoloSummaries"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv"
+if config["use_IRescue"]:
+    quant_report_input[
+        "IRescue"
+    ] = "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/"
+# if config["use_CellBender"]:
+#     i["CellBender"] = rules.CellBender.output.raw
 
 
 rule quant_report:
     input:
-        unpack(quant_report_input),
+        **quant_report_input,
     output:
-        "{outdir}/preprocess/quant_report.ipynb",
+        "{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
     conda:
         "../envs/scanpy.yaml"
     log:
-        notebook="{outdir}/preprocess/quant_report.ipynb",
+        notebook="{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
     notebook:
         "../notebooks/quant_report.py.ipynb"
 
