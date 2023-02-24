@@ -24,9 +24,12 @@ snakemake all --use-conda -c1 --directory .test --show-failed-logs
 The runsheet should have the following columns
 
 1. `run_id`: a unique identifier for each run
-2. `patient_id`: a unique identifier for each patient
-3. `r1`: the path to the R1 fastq file
-4. `r2`: the path to the R2 fastq file
+2. `r1`: the path to the R1 fastq file
+3. `r2`: the path to the R2 fastq file
+4. `total_barcodes`: the total number of barcodes in the run
+5. `cells_loaded`: the number of cells loaded into the run
+6. `expected_cells`: the number of cells expected to be yielded in the run
+7. `expected_multiplet_rate`: the expected multiplet rate of the run
 
 The patientsheet should have the following columns
 

@@ -6,9 +6,6 @@ properties:
   run_id:
     type: string
     description: 10x run identifier
-  patient_id:
-    type: string
-    description: patient identifier
   r1:
     type: string
     description: file path to read 1 fastq file
@@ -30,7 +27,6 @@ properties:
 
 required:
   - run_id
-  - patient_id
   - r1
   - r2
   - total_barcodes

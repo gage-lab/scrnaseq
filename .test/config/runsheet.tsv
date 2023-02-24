@@ -1,3 +1,3 @@
-run_id	patient_id	r1	r2	total_barcodes	cells_loaded	expected_cells	expected_multiplet_rate
-a	a	ngs-test-data/scrnaseq_10x_v3/a.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/a.chr21_R2.fastq.gz	6000	660	200	0.015
-b	b	ngs-test-data/scrnaseq_10x_v3/b.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/b.chr21_R2.fastq.gz	6000	660	200	0.015
+run_id	r1	r2	total_barcodes	cells_loaded	expected_cells	expected_multiplet_rate
+a	ngs-test-data/scrnaseq_10x_v3/a.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/a.chr21_R2.fastq.gz	6000	660	200	0.015
+b	ngs-test-data/scrnaseq_10x_v3/b.chr21_R1.fastq.gz	ngs-test-data/scrnaseq_10x_v3/b.chr21_R2.fastq.gz	6000	660	200	0.015
