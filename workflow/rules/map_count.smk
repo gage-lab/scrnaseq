@@ -76,8 +76,9 @@ rule STARsolo:
         solo10xProtocol=solo10xProtocol,
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
         soloCellFilter="EmptyDrops_CR",
-        soloMultiMappers="--solosoloMultiMappers "
-        + config["STARsolo"]["soloMultiMappers"],
+        soloMultiMappers="--soloMultiMappers " + config["STARsolo"]["soloMultiMappers"]
+        if config["STARsolo"]["soloMultiMappers"]
+        else "",
         outSAMtype="BAM SortedByCoordinate",
         soloOutFileNames="outs genes.tsv barcodes.tsv matrix.mtx",
         outFilterMultimapNmax=config["STARsolo"]["outFilterMultimapNmax"],
@@ -91,8 +92,7 @@ rule STARsolo:
             --readFilesCommand zcat \
             --soloType CB_UMI_Simple \
             --clipAdapterType CellRanger4 \
-            {params.solo10xProtocol} \
-            {params.soloMultiMappers} \
+            {params.solo10xProtocol} {params.soloMultiMappers} \
             --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM \
             --soloCBwhitelist {input.whitelist} \
             --soloFeatures {params.soloFeatures} \
