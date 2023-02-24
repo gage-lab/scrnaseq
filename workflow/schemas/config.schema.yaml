@@ -23,6 +23,13 @@ properties:
       - winAnchorMultimapNmax
       - soloMultiMappers
     properties:
+      10x_protocol:
+        type: string
+        description: 10x protocol used
+        enum:
+          - 5prime
+          - 3prime_v3
+          - 3prime_v2
       soloFeatures:
         type: array
         description: features to be extracted by STARsolo
