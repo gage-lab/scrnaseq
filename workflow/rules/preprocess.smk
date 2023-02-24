@@ -8,10 +8,6 @@ quant_report_input[
 quant_report_input[
     "STARsoloSummaries"
 ] = "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv"
-if config["use_IRescue"]:
-    quant_report_input[
-        "IRescue"
-    ] = "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/"
 # if config["use_CellBender"]:
 #     i["CellBender"] = rules.CellBender.output.raw
 
