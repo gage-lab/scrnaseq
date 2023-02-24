@@ -30,5 +30,6 @@ required:
   - r1
   - r2
   - total_barcodes
+  - cells_loaded
   - expected_cells
   - expected_multiplet_rate
