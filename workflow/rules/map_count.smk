@@ -28,6 +28,7 @@ rule STARindex:
 # setup STARsolo output
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
+    solo_outs[f"{f}_summary"] = (f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv",)
     for d in ["raw", "filtered"]:
         if f != "Velocyto":
             solo_outs[f"{f}_{d}"] = multiext(
