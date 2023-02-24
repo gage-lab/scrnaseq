@@ -47,11 +47,11 @@ for f in config["STARsolo"]["soloFeatures"]:
 # map and count
 # https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md
 # set 10x protocol parameters for STARsolo
-if config["STARsolo"]["10x_protocol"] == "5prime":
+if config["10x_chemistry"] == "5prime":
     solo10xProtocol = "--soloBarcodeMate 1 --clip5pNbases 39 0 --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10"
-elif config["STARsolo"]["10x_protocol"] == "3prime_v2":
+elif config["10x_chemistry"] == "3prime_v2":
     solo10xProtocol = "--soloUMIlen 16"
-elif config["STARsolo"]["10x_protocol"] == "3prime_v3":
+elif config["10x_chemistry"] == "3prime_v3":
     solo10xProtocol = "--soloUMIlen 12"
 else:
     raise ValueError("Invalid 10x protocol")
@@ -76,7 +76,8 @@ rule STARsolo:
         solo10xProtocol=solo10xProtocol,
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
         soloCellFilter="EmptyDrops_CR",
-        soloMultiMappers=config["STARsolo"]["soloMultiMappers"],
+        soloMultiMappers="--solosoloMultiMappers "
+        + config["STARsolo"]["soloMultiMappers"],
         outSAMtype="BAM SortedByCoordinate",
         soloOutFileNames="outs genes.tsv barcodes.tsv matrix.mtx",
         outFilterMultimapNmax=config["STARsolo"]["outFilterMultimapNmax"],
@@ -88,15 +89,16 @@ rule STARsolo:
             --genomeDir {input.idx} \
             --readFilesIn {input.r2} {input.r1} \
             --readFilesCommand zcat \
-            --soloOutFileNames {params.soloOutFileNames} \
             --soloType CB_UMI_Simple \
+            --clipAdapterType CellRanger4 \
             {params.solo10xProtocol} \
+            {params.soloMultiMappers} \
             --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM \
             --soloCBwhitelist {input.whitelist} \
             --soloFeatures {params.soloFeatures} \
             --soloCellFilter {params.soloCellFilter} \
             --soloOutFormatFeaturesGeneField3 "-" \
-            --soloMultiMappers {params.soloMultiMappers} \
+            --soloOutFileNames {params.soloOutFileNames} \
             --outFilterMultimapNmax {params.outFilterMultimapNmax} \
             --winAnchorMultimapNmax {params.winAnchorMultimapNmax} \
             --outSAMtype {params.outSAMtype} \
