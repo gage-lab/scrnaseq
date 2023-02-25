@@ -9,6 +9,4 @@ dependencies:
   - jupyter
   - jupyterlab_code_formatter
   - nbconvert
-  - pip
-  - pip:
-      - scrublet
+  - scrublet
