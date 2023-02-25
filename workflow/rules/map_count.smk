@@ -85,10 +85,14 @@ rule STARsolo:
         winAnchorMultimapNmax=config["STARsolo"]["winAnchorMultimapNmax"],
     shell:
         """
+        # handle multiple lanes in run
+        r1=$(echo {input.r1} | tr ' ' ',')
+        r2=$(echo {input.r2} | tr ' ' ',')
+
         STAR \
             --runThreadN {threads} \
             --genomeDir {input.idx} \
-            --readFilesIn {input.r2} {input.r1} \
+            --readFilesIn $r2 $r1 \
             --readFilesCommand zcat \
             --soloType CB_UMI_Simple \
             --clipAdapterType CellRanger4 \
@@ -163,6 +167,7 @@ rule IRescue:
         """
         irescue \
             --bam {input.bam} \
+            --tmpdir IRescue_tmp_{wildcards.run}_{wildcards.soloFeatures} \
             --genome {params.genome} \
             --threads {threads} \
             --outdir $(dirname {output[0]}) \
