@@ -4,6 +4,7 @@
 # in particular regarding the standardized folder structure mentioned there.
 
 import os, shutil, yaml
+from pathlib import Path
 import pandas as pd
 from snakemake.utils import min_version
 from snakemake.utils import validate
@@ -30,6 +31,7 @@ validate(patients, "schemas/patientsheet.schema.yaml")
 patients.set_index("patient_id", inplace=True, drop=False)
 
 # copy config data to output directory
+Path(config["outdir"]).mkdir(exist_ok=True)
 with open(config["outdir"] + "/config.yaml", "w") as f:
     yaml.dump(config, f, default_flow_style=False)
 shutil.copy(config["runsheet"], config["outdir"])
