@@ -139,6 +139,7 @@ rule CellBender:
         "../envs/cellbender.yaml"
     shell:
         """
+        mkdir -p $(dirname {output.raw})
         cellbender remove-background \
             --input $(dirname {input}) \
             --output {output.raw} \
