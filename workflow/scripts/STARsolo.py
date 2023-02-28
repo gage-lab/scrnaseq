@@ -7,7 +7,7 @@ from pathlib import Path
 from snakemake.shell import shell
 
 # setup input fastqs and outdir
-if type(snakemake.input.r1) == "str":
+if type(snakemake.input.r1) is str:
     r1 = snakemake.input.r1
     r2 = snakemake.input.r2
 else:
@@ -34,6 +34,8 @@ else:
     raise ValueError("Invalid 10x protocol")
 
 # set read command
+print(f"Read 1 file(s): {r1}")
+print(f"Read 2 file(s): {r2}")
 if r1.endswith(".gz"):
     readcmd = "gunzip -c"
 elif r1.endswith(".bz2"):
