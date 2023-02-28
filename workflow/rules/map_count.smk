@@ -25,6 +25,8 @@ rule STARindex:
         "STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {output} --genomeFastaFiles {input.fa} --sjdbGTFfile {input.gtf} --genomeSAindexNbases {params.genomeSAindexNbases}"
 
 
+# map and count
+# https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md
 # setup STARsolo output
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
@@ -44,18 +46,6 @@ for f in config["STARsolo"]["soloFeatures"]:
                 "unspliced.mtx",
             )
 
-# map and count
-# https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md
-# set 10x protocol parameters for STARsolo
-if config["10x_chemistry"] == "5prime":
-    solo10xProtocol = "--soloBarcodeMate 1 --clip5pNbases 39 0 --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10"
-elif config["10x_chemistry"] == "3prime_v2":
-    solo10xProtocol = "--soloUMIlen 16"
-elif config["10x_chemistry"] == "3prime_v3":
-    solo10xProtocol = "--soloUMIlen 12"
-else:
-    raise ValueError("Invalid 10x protocol")
-
 
 rule STARsolo:
     input:
@@ -73,52 +63,9 @@ rule STARsolo:
     conda:
         "../envs/star.yaml"
     params:
-        solo10xProtocol=solo10xProtocol,
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
-        soloCellFilter="EmptyDrops_CR",
-        soloMultiMappers="--soloMultiMappers "
-        + str(config["STARsolo"]["soloMultiMappers"])
-        if config["STARsolo"].get("soloMultiMappers")
-        else "",
-        soloBarcodeReadLength="--soloBarcodeReadLength "
-        + str(config["STARsolo"]["soloBarcodeReadLength"])
-        if config["STARsolo"].get("soloBarcodeReadLength")
-        else "",
-        outSAMtype="BAM SortedByCoordinate",
-        soloOutFileNames="outs genes.tsv barcodes.tsv matrix.mtx",
-        outFilterMultimapNmax=config["STARsolo"]["outFilterMultimapNmax"],
-        winAnchorMultimapNmax=config["STARsolo"]["winAnchorMultimapNmax"],
-    shell:
-        """
-        # handle multiple lanes in run
-        r1=$(echo {input.r1} | tr ' ' ',')
-        r2=$(echo {input.r2} | tr ' ' ',')
-
-        STAR \
-            --runThreadN {threads} \
-            --genomeDir {input.idx} \
-            --readFilesIn $r2 $r1 \
-            --readFilesCommand zcat \
-            --soloType CB_UMI_Simple \
-            --clipAdapterType CellRanger4 \
-            {params.solo10xProtocol} {params.soloMultiMappers} {params.soloBarcodeReadLength} \
-            --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM \
-            --soloCBwhitelist {input.whitelist} \
-            --soloFeatures {params.soloFeatures} \
-            --soloCellFilter {params.soloCellFilter} \
-            --soloOutFormatFeaturesGeneField3 "-" \
-            --soloOutFileNames {params.soloOutFileNames} \
-            --outFilterMultimapNmax {params.outFilterMultimapNmax} \
-            --winAnchorMultimapNmax {params.winAnchorMultimapNmax} \
-            --outSAMtype {params.outSAMtype} \
-            --outFileNamePrefix "$(dirname {output.bam})/"
-
-        # index output
-        sambamba index -t {threads} {output.bam}
-
-        # cleanup tmpdir
-        rm -rf $(dirname {output.bam})/_STARtmp
-        """
+    script:
+        "../scripts/STARsolo.py"
 
 
 # remove ambient RNA and filter empty droplets

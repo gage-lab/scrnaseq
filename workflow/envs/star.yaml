@@ -4,4 +4,3 @@ channels:
   - nodefaults
 dependencies:
   - star>=2.7.10b
-  - sambamba
