@@ -135,8 +135,8 @@ rule CellBender:
     params:
         expected_cells=lambda wc: runs.loc[wc.run, "expected_cells"],
         total_droplets_included=lambda wc: runs.loc[wc.run, "total_barcodes"],
-    container:
-        "docker://us.gcr.io/broad-dsde-methods/cellbender:latest"
+    conda:
+        "../envs/cellbender.yaml"
     shell:
         """
         cellbender remove-background \
@@ -150,15 +150,23 @@ rule CellBender:
 # quantify transposable element expression
 # https://github.com/bodegalab/irescue
 # https://www.biorxiv.org/content/10.1101/2022.09.16.508229v2.full
+def get_irescue_whitelist(wildcards):
+    key = "GeneFull" if "GeneFull" in config["STARsolo"]["soloFeatures"] else "Gene"
+    if config["use_CellBender"]:
+        return expand(
+            rules.CellBender.output.barcodes, soloFeatures=key, allow_missing=True
+        )
+    else:
+        return f"{{outdir}}/map_count/{{run}}/outs{key}/filtered/barcodes.tsv"
+
+
 rule IRescue:
     input:
         bam=rules.STARsolo.output.bam,
-        whitelist=rules.CellBender.output.barcodes
-        if config["use_CellBender"]
-        else "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/barcodes.tsv",
+        whitelist=get_irescue_whitelist,
     output:
         multiext(
-            "{outdir}/map_count/{run}/outs{soloFeatures}/IRescue/",
+            "{outdir}/map_count/{run}/IRescue/",
             "barcodes.tsv.gz",
             "features.tsv.gz",
             "matrix.mtx.gz",
@@ -172,7 +180,7 @@ rule IRescue:
         """
         irescue \
             --bam {input.bam} \
-            --tmpdir IRescue_tmp_{wildcards.run}_{wildcards.soloFeatures} \
+            --tmpdir IRescue_tmp_{wildcards.run} \
             --genome {params.genome} \
             --threads {threads} \
             --outdir $(dirname {output[0]}) \
