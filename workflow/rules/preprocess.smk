@@ -23,6 +23,8 @@ rule filter:
     log:
         notebook="{outdir}/preprocess/{run}/{soloFeatures}/filter_report.ipynb",
     params:
-        expected_multiplet_rate=lambda wc: runs.loc[wc.run, "expected_multiplet_rate"],
+        expected_multiplet_rate=lambda wc: runs[runs["run_id"] == wc.run][
+            "expected_multiplet_rate"
+        ].unique()[0],
     notebook:
         "../notebooks/filter.py.ipynb"

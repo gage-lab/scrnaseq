@@ -133,8 +133,12 @@ rule CellBender:
         pdf="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.pdf",
         barcodes="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_cell_barcodes.csv",
     params:
-        expected_cells=lambda wc: runs.loc[wc.run, "expected_cells"],
-        total_droplets_included=lambda wc: runs.loc[wc.run, "total_barcodes"],
+        expected_cells=lambda wc: runs[runs["run_id"] == wc.run][
+            "expected_cells"
+        ].unique()[0],
+        total_droplets_included=lambda wc: runs[runs["run_id"] == wc.run][
+            "total_barcodes"
+        ].unique()[0],
     conda:
         "../envs/cellbender.yaml"
     shell:
