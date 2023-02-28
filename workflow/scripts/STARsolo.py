@@ -7,16 +7,16 @@ from pathlib import Path
 from snakemake.shell import shell
 
 # setup input fastqs and outdir
-r1 = (
-    ",".join(snakemake.input.r1)
-    if type(snakemake.input.r1) == "list"
-    else snakemake.input.r1
-)
-r2 = (
-    ",".join(snakemake.input.r2)
-    if type(snakemake.input.r2) == "list"
-    else snakemake.input.r2
-)
+if type(snakemake.input.r1) == "str":
+    r1 = snakemake.input.r1
+    r2 = snakemake.input.r2
+else:
+    assert len(snakemake.input.r1) == len(
+        snakemake.input.r2
+    ), "Unequal number of R1 and R2 files"
+    r1 = ",".join(snakemake.input.r1)
+    r2 = ",".join(snakemake.input.r2)
+
 outdir = str(Path(snakemake.output.bam).parent) + "/"
 
 # set readFilesIn and solo10xProtocol
