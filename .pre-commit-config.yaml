@@ -8,7 +8,6 @@ repos:
       - id: trailing-whitespace
       - id: check-added-large-files
       - id: check-executables-have-shebangs
-      - id: detect-aws-credentials
       - id: detect-private-key
   - repo: https://github.com/snakemake/snakefmt
     rev: v0.8.1
