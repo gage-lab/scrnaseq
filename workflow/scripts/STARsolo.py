@@ -2,9 +2,10 @@
 # Created on: 10/26/22, 1:59 PM
 __author__ = "Michael Cuoco"
 
-import tempfile
+import tempfile, os
 from pathlib import Path
 from snakemake.shell import shell
+
 
 # setup input fastqs and outdir
 if type(snakemake.input.r1) is str:
@@ -65,6 +66,11 @@ outFilterMultimapNmax = snakemake.config["STARsolo"]["outFilterMultimapNmax"]
 winAnchorMultimapNmax = snakemake.config["STARsolo"]["winAnchorMultimapNmax"]
 
 with tempfile.TemporaryDirectory() as tmpdir:
+    statvfs = os.statvfs(tmpdir)
+    if statvfs.f_frsize * statvfs.f_bavail < 2e10:
+        print(
+            "WARNING: Less than 20 GB of free disk space detected at tmpdir location. STAR may fail due to lack of disk space. Set $TMPDIR to a location with more free space."
+        )
     shell(
         "STAR "
         " --runThreadN {snakemake.threads}"
