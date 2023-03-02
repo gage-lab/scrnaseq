@@ -1,3 +1,30 @@
+quant_report_input = dict()
+quant_report_input[
+    "STARsoloRaw"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx"
+quant_report_input[
+    "STARsoloFiltered"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx"
+quant_report_input[
+    "STARsoloSummaries"
+] = "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv"
+# if config["use_CellBender"]:
+#     i["CellBender"] = rules.CellBender.output.raw
+
+
+rule quant_report:
+    input:
+        **quant_report_input,
+    output:
+        "{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
+    conda:
+        "../envs/scanpy.yaml"
+    log:
+        notebook="{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
+    notebook:
+        "../notebooks/quant_report.py.ipynb"
+
+
 # define filter input based on config values
 def get_filter_input(wildcards):
     i = dict()
