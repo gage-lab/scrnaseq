@@ -15,7 +15,7 @@ rule STARindex:
     input:
         **refdata,
     output:
-        directory("resources/STARsolo"),
+        protected(directory("resources/STARsolo")),
     threads: 8
     conda:
         "../envs/star.yaml"
@@ -71,7 +71,7 @@ rule STARsolo:
 
 # remove ambient RNA and filter empty droplets
 # https://cellbender.readthedocs.io/
-# TODO: provide instructions on how to run this using a GPU
+# check if gpu is available
 rule CellBender:
     input:
         "{outdir}/map_count/{run}/outs{soloFeatures}/raw/barcodes.tsv",
@@ -88,15 +88,26 @@ rule CellBender:
             "total_barcodes"
         ].unique()[0],
     conda:
-        "../envs/cellbender.yaml"
+        # use CUDA if GPU is present
+        "../envs/cellbender_cuda.yaml" if shutil.which(
+        "nvidia-smi"
+        ) else "../envs/cellbender.yaml"
     shell:
         """
+        # use CUDA if GPU is present
+        if which nvidia-smi > /dev/null; then
+            cuda="--cuda"
+        else
+            cuda=""
+        fi
+
+        # run cellbender
         mkdir -p $(dirname {output.raw})
         cellbender remove-background \
             --input $(dirname {input}) \
             --output {output.raw} \
             --expected-cells {params.expected_cells} \
-            --total-droplets-included {params.total_droplets_included}
+            --total-droplets-included {params.total_droplets_included} $cuda
         """
 
 

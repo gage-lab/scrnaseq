@@ -1,0 +1,14 @@
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python=3.7
+  - pip
+  - pytables
+  - pytorch-cuda=11.7
+  - torchvision
+  - pip:
+      - "--editable=git+https://github.com/broadinstitute/CellBender.git#egg=CellBender"
