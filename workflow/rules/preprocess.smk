@@ -25,6 +25,23 @@ rule quant_report:
         "../notebooks/quant_report.py.ipynb"
 
 
+rule visual_report:
+    input:
+        expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+    output:
+        "{outdir}/preprocess/visual_report_{soloFeatures}.ipynb",
+    conda:
+        "../envs/scanpy.yaml"
+    log:
+        notebook="{outdir}/preprocess/visual_report_{soloFeatures}.ipynb",
+    notebook:
+        "../notebooks/visual_report.py.ipynb"
+
+
 # define filter input based on config values
 def get_filter_input(wildcards):
     i = dict()

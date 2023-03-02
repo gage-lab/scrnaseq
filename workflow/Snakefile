@@ -68,3 +68,9 @@ rule all:
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
+        expand(
+            rules.visual_report.output,
+            run=runs["run_id"],
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        ),
