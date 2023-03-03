@@ -49,25 +49,19 @@ patientsheet: <path to patientsheet>
 ```bash
 # run the workflow all the way through
 # -c16 = use 16 cores, this can be changed to whatever you want
-snakemake all --use-conda -c16 --show-failed-logs
+outdir="<path to output directory>"
+snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir"
 ```
 
 To run until a certain step, use the `--until` flag
 
 ```bash
 # run until a certain step
-snakemake all --use-conda -c16 --show-failed-logs --until <rule name>
+snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir" --until <rule name>
 
 # IE: stop after indexing the genome
-snakemake all --use-conda -c16 --show-failed-logs --until STARindex
+snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir" --until STARindex
 
 # IE: stop after the STARsolo
-snakemake all --use-conda -c16 --show-failed-logs --until STARsolo
-```
-
-To execute via a cluster job submission system, use the `--cluster` and `--jobs` flags
-
-```bash
-# run on a cluster using Sun Grid Engine (SGE)
-snakemake all --use-conda --show-failed-logs --cluster "qsub -cwd -V -pe smp {threads} -l h_vmem={resources.mem_mb}M -l h_rt={resources.runtime} -o {log} -e {log}" --jobs 16
+snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir" --until STARsolo
 ```
