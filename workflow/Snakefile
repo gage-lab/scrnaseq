@@ -57,7 +57,7 @@ if "Velocyto" in config["STARsolo"]["soloFeatures"]:
 rule all:
     input:
         expand(
-            rules.filter.output,
+            rules.normalize_pca_scanorama.output,
             run=runs["run_id"],
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
