@@ -44,7 +44,8 @@ rule filter:
     input:
         unpack(get_filter_input),
     output:
-        "{outdir}/preprocess/{run}/{soloFeatures}/filtered.h5mu",
+        mdata="{outdir}/preprocess/{run}/{soloFeatures}/filtered.h5mu",
+        stats="{outdir}/preprocess/{run}/{soloFeatures}/filter_stats.txt",
     conda:
         "../envs/scanpy.yaml"
     log:
@@ -55,3 +56,20 @@ rule filter:
         ].unique()[0],
     notebook:
         "../notebooks/filter.py.ipynb"
+
+
+rule normalize_pca_scanorama:
+    input:
+        expand(
+            rules.filter.output.mdata,
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+    output:
+        "{outdir}/integrate/{soloFeatures}.h5ad",
+    conda:
+        "../envs/scanpy.yaml"
+    log:
+        notebook="{outdir}/integrate/{soloFeatures}_normalize_pca_scanorama_report.ipynb",
+    notebook:
+        "../notebooks/normalize_pca_scanorama.py.ipynb"
