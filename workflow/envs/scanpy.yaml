@@ -12,3 +12,4 @@ dependencies:
   - nbconvert
   - scrublet
   - scanorama
+  - plotly
