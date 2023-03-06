@@ -30,7 +30,7 @@ rule STARindex:
 # setup STARsolo output
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
-    solo_outs[f"{f}_summary"] = (f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv",)
+    solo_outs[f"{f}_summary"] = f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv"
     for d in ["raw", "filtered"]:
         if f != "Velocyto":
             solo_outs[f"{f}_{d}"] = multiext(
@@ -67,6 +67,33 @@ rule STARsolo:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
     script:
         "../scripts/STARsolo.py"
+
+
+rule STARsolo_report:
+    input:
+        raw=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+        filtered=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+        summary=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+    output:
+        "{outdir}/map_count/{soloFeatures}_report.ipynb",
+    log:
+        notebook="{outdir}/map_count/{soloFeatures}_report.ipynb",
+    conda:
+        "../envs/scanpy.yaml"
+    notebook:
+        "../notebooks/STARsolo_report.py.ipynb"
 
 
 # remove ambient RNA and filter empty droplets
