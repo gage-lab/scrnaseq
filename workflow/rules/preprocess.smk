@@ -22,18 +22,32 @@ def get_filter_input(wildcards):
     return i
 
 
-# remove empty droplets, lowly expressed genes, low quality + dead cells, and multiplets
+# remove empty droplets, low quality + dead cells, and multiplets
 rule filter:
     input:
         unpack(get_filter_input),
     output:
-        "{outdir}/preprocess/filter/{soloFeatures}.h5ad",
+        h5ad="{outdir}/preprocess/filter/{soloFeatures}.h5ad",
+        report="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     conda:
         "../envs/pegasus.yaml"
+    shadow:
+        "shallow"
     log:
         notebook="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     notebook:
         "../notebooks/filter.py.ipynb"
+
+
+rule render_filter_report:
+    input:
+        rules.filter.output.report,
+    output:
+        "{outdir}/preprocess/filter/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --no-input --to html {input}"
 
 
 # rule normalize_pca_scanorama:

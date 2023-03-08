@@ -54,17 +54,6 @@ if "Velocyto" in config["STARsolo"]["soloFeatures"]:
     config["STARsolo"]["soloFeatures"].remove("Velocyto")
 
 
-rule render_STARsolo_report:
-    input:
-        rules.STARsolo_report.output,
-    output:
-        "{outdir}/map_count/{soloFeatures}_report.html",
-    conda:
-        "envs/jupyter.yaml"
-    shell:
-        "jupyter nbconvert --no-input --to html {input}"
-
-
 rule all:
     input:
         expand(
@@ -73,7 +62,7 @@ rule all:
             outdir=config["outdir"],
         ),
         expand(
-            rules.filter.output,
+            rules.render_filter_report.output,
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
