@@ -46,9 +46,7 @@ if istest:
 # include rules in other files
 include: "rules/ref.smk"
 include: "rules/map_count.smk"
-
-
-# include: "rules/preprocess.smk"
+include: "rules/preprocess.smk"
 
 
 # remove Veloctyo from soloFeatures to prevent expansion
