@@ -98,6 +98,17 @@ rule STARsolo_report:
         "../notebooks/STARsolo_report.py.ipynb"
 
 
+rule render_STARsolo_report:
+    input:
+        rules.STARsolo_report.output,
+    output:
+        "{outdir}/map_count/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --no-input --to html {input}"
+
+
 # remove ambient RNA and filter empty droplets
 # https://cellbender.readthedocs.io/
 # check if gpu is available
