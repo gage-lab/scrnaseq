@@ -50,18 +50,26 @@ rule render_filter_report:
         "jupyter nbconvert --no-input --to html {input}"
 
 
-# rule normalize_pca_scanorama:
-#     input:
-#         expand(
-#             rules.filter.output.mdata,
-#             run=runs["run_id"],
-#             allow_missing=True,
-#         ),
-#     output:
-#         "{outdir}/integrate/{soloFeatures}.h5ad",
-#     conda:
-#         "../envs/scanpy.yaml"
-#     log:
-#         notebook="{outdir}/integrate/{soloFeatures}_normalize_pca_scanorama_report.ipynb",
-#     notebook:
-#         "../notebooks/normalize_pca_scanorama.py.ipynb"
+rule integrate:
+    input:
+        rules.filter.output.h5ad,
+    output:
+        h5ad="{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
+        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+    conda:
+        "../envs/pegasus.yaml"
+    log:
+        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+    notebook:
+        "../notebooks/integrate.py.ipynb"
+
+
+rule render_integrate_report:
+    input:
+        rules.integrate.output.notebook,
+    output:
+        "{outdir}/preprocess/integrate/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --no-input --to html {input}"
