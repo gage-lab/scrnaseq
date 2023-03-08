@@ -90,8 +90,6 @@ rule STARsolo_report:
         "{outdir}/map_count/{soloFeatures}_report.ipynb",
     log:
         notebook="{outdir}/map_count/{soloFeatures}_report.ipynb",
-    shadow:
-        "shallow"
     conda:
         "../envs/pegasus.yaml"
     notebook:
