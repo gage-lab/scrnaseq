@@ -16,12 +16,6 @@ use_CellBender: false
 use_IRescue: true
 
 preprocess:
-  empty:
-    min_genes: 2
-  lowexp:
-    min_cells: 2
-  low_quality:
-    activate: true      # TODO: prevent pipeline from running past filter step if activate==false
-    min_counts: 100
-    max_pct_mt: 5
-    min_genes: 50
+  min_counts: 100
+  min_genes: 50
+  max_pct_mt: 5
