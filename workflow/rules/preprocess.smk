@@ -74,3 +74,29 @@ rule render_integrate_report:
         "../envs/jupyter.yaml"
     shell:
         "jupyter nbconvert --to html {input}"
+
+
+rule cluster:
+    input:
+        rules.integrate.output.h5ad,
+    output:
+        h5ad="{outdir}/preprocess/cluster/{soloFeatures}.h5ad",
+        notebook="{outdir}/preprocess/cluster/{soloFeatures}_report.ipynb",
+    threads: 8
+    conda:
+        "../envs/pegasus.yaml"
+    log:
+        notebook="{outdir}/preprocess/cluster/{soloFeatures}_report.ipynb",
+    notebook:
+        "../notebooks/cluster.py.ipynb"
+
+
+rule render_cluster_report:
+    input:
+        rules.cluster.output.notebook,
+    output:
+        "{outdir}/preprocess/cluster/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --to html {input}"

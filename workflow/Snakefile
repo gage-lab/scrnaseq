@@ -71,3 +71,8 @@ rule all:
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
+        expand(
+            rules.render_cluster_report.output,
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        ),
