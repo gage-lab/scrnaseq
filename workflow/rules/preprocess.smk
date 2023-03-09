@@ -31,8 +31,6 @@ rule filter:
         report="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     conda:
         "../envs/pegasus.yaml"
-    shadow:
-        "shallow"
     log:
         notebook="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     notebook:
