@@ -1,5 +1,5 @@
 # use test reference data if test fastqs are used
-if istest:
+if config["istest"]:
     refdata = {
         "fa": "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa",
         "gtf": "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf",
@@ -20,7 +20,7 @@ rule STARindex:
     conda:
         "../envs/star.yaml"
     params:
-        genomeSAindexNbases=11 if istest else 14,
+        genomeSAindexNbases=11 if config["istest"] else 14,
     shell:
         "STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {output} --genomeFastaFiles {input.fa} --sjdbGTFfile {input.gtf} --genomeSAindexNbases {params.genomeSAindexNbases}"
 
