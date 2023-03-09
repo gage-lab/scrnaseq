@@ -1,5 +1,5 @@
 # use test reference data if test fastqs are used
-if istest:
+if config["istest"]:
     refdata = {
         "fa": "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa",
         "gtf": "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf",
@@ -20,7 +20,7 @@ rule STARindex:
     conda:
         "../envs/star.yaml"
     params:
-        genomeSAindexNbases=11 if istest else 14,
+        genomeSAindexNbases=11 if config["istest"] else 14,
     shell:
         "STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {output} --genomeFastaFiles {input.fa} --sjdbGTFfile {input.gtf} --genomeSAindexNbases {params.genomeSAindexNbases}"
 
@@ -30,7 +30,7 @@ rule STARindex:
 # setup STARsolo output
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
-    solo_outs[f"{f}_summary"] = (f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv",)
+    solo_outs[f"{f}_summary"] = f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv"
     for d in ["raw", "filtered"]:
         if f != "Velocyto":
             solo_outs[f"{f}_{d}"] = multiext(
@@ -67,6 +67,45 @@ rule STARsolo:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
     script:
         "../scripts/STARsolo.py"
+
+
+rule STARsolo_report:
+    input:
+        raw=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+        filtered=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+        summary=expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
+            run=runs["run_id"],
+            allow_missing=True,
+        ),
+    output:
+        "{outdir}/map_count/{soloFeatures}_report.ipynb",
+    log:
+        notebook="{outdir}/map_count/{soloFeatures}_report.ipynb",
+    conda:
+        "../envs/pegasus.yaml"
+    threads: 1e3
+    notebook:
+        "../notebooks/STARsolo_report.py.ipynb"
+
+
+rule render_STARsolo_report:
+    input:
+        rules.STARsolo_report.output,
+    output:
+        "{outdir}/map_count/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --no-input --to html {input}"
 
 
 # remove ambient RNA and filter empty droplets

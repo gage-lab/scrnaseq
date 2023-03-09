@@ -4,11 +4,10 @@ channels:
   - nodefaults
 dependencies:
   - python=3.9 # must be <3.10 for scanorama
-  - scanpy>=1.7.2
-  - mudata>=0.2.1
-  - matplotlib==3.6 # needed to avoid TypeError in scanpy
   - jupyter
   - jupyterlab_code_formatter
   - nbconvert
   - scrublet
   - scanorama
+  - plotly
+  - pegasuspy

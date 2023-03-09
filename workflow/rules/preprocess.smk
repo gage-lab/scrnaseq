@@ -1,75 +1,75 @@
-quant_report_input = dict()
-quant_report_input[
-    "STARsoloRaw"
-] = "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx"
-quant_report_input[
-    "STARsoloFiltered"
-] = "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx"
-quant_report_input[
-    "STARsoloSummaries"
-] = "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv"
-# if config["use_CellBender"]:
-#     i["CellBender"] = rules.CellBender.output.raw
-
-
-rule quant_report:
-    input:
-        **quant_report_input,
-    output:
-        "{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
-    conda:
-        "../envs/scanpy.yaml"
-    log:
-        notebook="{outdir}/preprocess/{run}/{soloFeatures}/quant_report.ipynb",
-    notebook:
-        "../notebooks/quant_report.py.ipynb"
-
-
 # define filter input based on config values
 def get_filter_input(wildcards):
     i = dict()
     if config["use_CellBender"]:
-        i["CellBender"] = rules.CellBender.output.filtered
+        i["CellBender"] = expand(
+            rules.CellBender.output.filtered,
+            run=runs["run_id"],
+            allow_missing=True,
+        )
     else:
-        i[
-            "STARsolo"
-        ] = "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx"
+        i["STARsolo"] = expand(
+            "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
+            run=runs["run_id"],
+            allow_missing=True,
+        )
     if config["use_IRescue"]:
-        i["IRescue"] = rules.IRescue.output
+        i["IRescue"] = expand(
+            "{outdir}/map_count/{run}/IRescue/matrix.mtx.gz",
+            run=runs["run_id"],
+            allow_missing=True,
+        )
     return i
 
 
-# remove empty droplets, lowly expressed genes, low quality + dead cells, and multiplets
+# remove empty droplets, low quality + dead cells, and multiplets
 rule filter:
     input:
         unpack(get_filter_input),
     output:
-        mdata="{outdir}/preprocess/{run}/{soloFeatures}/filtered.h5mu",
-        stats="{outdir}/preprocess/{run}/{soloFeatures}/filter_stats.txt",
+        h5ad=temp("{outdir}/preprocess/filter/{soloFeatures}.h5ad"),
+        report="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     conda:
-        "../envs/scanpy.yaml"
+        "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/preprocess/{run}/{soloFeatures}/filter_report.ipynb",
-    params:
-        expected_multiplet_rate=lambda wc: runs[runs["run_id"] == wc.run][
-            "expected_multiplet_rate"
-        ].unique()[0],
+        notebook="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
+    threads: 1e3
     notebook:
         "../notebooks/filter.py.ipynb"
 
 
-rule normalize_pca_scanorama:
+rule render_filter_report:
     input:
-        expand(
-            rules.filter.output.mdata,
-            run=runs["run_id"],
-            allow_missing=True,
-        ),
+        rules.filter.output.report,
     output:
-        "{outdir}/integrate/{soloFeatures}.h5ad",
+        "{outdir}/preprocess/filter/{soloFeatures}_report.html",
     conda:
-        "../envs/scanpy.yaml"
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --no-input --to html {input}"
+
+
+rule integrate:
+    input:
+        rules.filter.output.h5ad,
+    output:
+        h5ad="{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
+        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+    threads: 8
+    conda:
+        "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/integrate/{soloFeatures}_normalize_pca_scanorama_report.ipynb",
+        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
     notebook:
-        "../notebooks/normalize_pca_scanorama.py.ipynb"
+        "../notebooks/integrate.py.ipynb"
+
+
+rule render_integrate_report:
+    input:
+        rules.integrate.output.notebook,
+    output:
+        "{outdir}/preprocess/integrate/{soloFeatures}_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "jupyter nbconvert --to html {input}"
