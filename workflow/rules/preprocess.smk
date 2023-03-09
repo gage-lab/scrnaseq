@@ -56,6 +56,7 @@ rule integrate:
     output:
         h5ad="{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
         notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+    threads: 8
     conda:
         "../envs/pegasus.yaml"
     log:
@@ -72,4 +73,4 @@ rule render_integrate_report:
     conda:
         "../envs/jupyter.yaml"
     shell:
-        "jupyter nbconvert --no-input --to html {input}"
+        "jupyter nbconvert --to html {input}"
