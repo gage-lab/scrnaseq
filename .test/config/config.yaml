@@ -16,6 +16,9 @@ use_CellBender: false
 use_IRescue: true
 
 preprocess:
-  min_counts: 100
-  min_genes: 50
-  max_pct_mt: 5
+  min_counts: 10
+  min_genes: 10
+  max_pct_mt: 10
+  regress_out:
+    - "n_counts"
+    - "percent_mito"

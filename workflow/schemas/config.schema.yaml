@@ -75,6 +75,18 @@ properties:
     min_genes:
       type: integer
       description: minimum number of genes detected in a cell
+    signatures:
+      type: array
+      description: signatures to be calculated
+      enum:
+        - cell_cycle_human
+        - apoptosis_human
+        - gender_human
+        - mitochondrial_genes_human
+        - ribosomal_genes_human
+    regress_out:
+      type: array
+      description: variables to be regressed out
 
 required:
   - outdir
