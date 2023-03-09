@@ -27,7 +27,7 @@ rule filter:
     input:
         unpack(get_filter_input),
     output:
-        h5ad="{outdir}/preprocess/filter/{soloFeatures}.h5ad",
+        h5ad=temp("{outdir}/preprocess/filter/{soloFeatures}.h5ad"),
         report="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     conda:
         "../envs/pegasus.yaml"
