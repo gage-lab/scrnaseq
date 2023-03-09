@@ -92,6 +92,7 @@ rule STARsolo_report:
         notebook="{outdir}/map_count/{soloFeatures}_report.ipynb",
     conda:
         "../envs/pegasus.yaml"
+    threads: 1e3
     notebook:
         "../notebooks/STARsolo_report.py.ipynb"
 

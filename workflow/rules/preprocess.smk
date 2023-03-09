@@ -33,6 +33,7 @@ rule filter:
         "../envs/pegasus.yaml"
     log:
         notebook="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
+    threads: 1e3
     notebook:
         "../notebooks/filter.py.ipynb"
 
