@@ -32,15 +32,12 @@ patients.set_index("patient_id", inplace=True, drop=False)
 
 # copy config data to output directory
 Path(config["outdir"]).mkdir(exist_ok=True)
-with open(config["outdir"] + "/config.yaml", "w") as f:
-    yaml.dump(config, f, default_flow_style=False)
+shutil.copy("config/config.yaml", config["outdir"])
 shutil.copy(config["runsheet"], config["outdir"])
 shutil.copy(config["patientsheet"], config["outdir"])
 
 # indicator variable for if this run is a test or not
-istest = True if "ngs-test-data" in runs.r1[0] else False
-if istest:
-    print("This is a test run.")
+config["istest"] = True if "ngs-test-data" in runs.r1[0] else False
 
 
 # include rules in other files
