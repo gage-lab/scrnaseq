@@ -87,6 +87,10 @@ properties:
     regress_out:
       type: array
       description: variables to be regressed out
+    resolutions:
+      type: array
+      description: resolutions to run leiden clustering
+
 
 required:
   - outdir

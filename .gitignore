@@ -6,3 +6,4 @@ logs/**
 .snakemake/**
 .test/results**
 .test/resources**
+*pyc

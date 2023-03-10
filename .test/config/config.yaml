@@ -22,3 +22,6 @@ preprocess:
   regress_out:
     - "n_counts"
     - "percent_mito"
+  resolutions:
+    - 1.2
+    - 1.3

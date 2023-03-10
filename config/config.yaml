@@ -31,3 +31,4 @@ preprocess:
     min_counts: 1000
     max_pct_mt: 5
     min_genes: 100
+  resolutions:
