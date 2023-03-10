@@ -53,7 +53,7 @@ rule integrate:
     input:
         rules.filter.output.h5ad,
     output:
-        h5ad="{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
+        h5ad=temp("{outdir}/preprocess/integrate/{soloFeatures}.h5ad"),
         notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
     threads: 8
     conda:
