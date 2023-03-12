@@ -65,6 +65,8 @@ rule STARsolo:
         "../envs/star.yaml"
     params:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
+    log:
+        "{outdir}/map_count/{run}/STARsolo.log",
     script:
         "../scripts/STARsolo.py"
 
