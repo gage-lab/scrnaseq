@@ -71,6 +71,20 @@ rule STARsolo:
         "../scripts/STARsolo.py"
 
 
+rule sambamba_index:
+    input:
+        rules.STARsolo.output.bam,
+    output:
+        "{outdir}/map_count/{run}/Aligned.sortedByCoord.out.bam.bai",
+    log:
+        "{outdir}/map_count/{run}/sambamba_index.log",
+    params:
+        extra="",  # this must be preset
+    threads: 8
+    wrapper:
+        "v1.23.5/bio/sambamba/index"
+
+
 rule STARsolo_report:
     input:
         raw=expand(
@@ -168,6 +182,7 @@ def get_irescue_whitelist(wildcards):
 rule IRescue:
     input:
         bam=rules.STARsolo.output.bam,
+        bai=rules.sambamba_index.output,
         whitelist=get_irescue_whitelist,
     output:
         multiext(
