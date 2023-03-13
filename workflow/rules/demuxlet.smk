@@ -109,3 +109,19 @@ rule demuxlet:
             --vcf {input.vcf} \
             --out $out
         """
+
+
+rule demuxlet_report:
+    input:
+        demuxlet=expand(
+            rules.demuxlet.output, run=runs["run_id"].unique(), allow_missing=True
+        ),
+        matrix=expand(filtered_mtx, run=runs["run_id"].unique(), allow_missing=True),
+    output:
+        "{outdir}/demuxlet/demuxlet_report.ipynb",
+    conda:
+        "../envs/pegasus.yaml"
+    log:
+        notebook="{outdir}/demuxlet/demuxlet_report.ipy",
+    notebook:
+        "../notebooks/demuxlet_report.py.ipynb"
