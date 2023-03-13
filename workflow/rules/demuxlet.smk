@@ -116,7 +116,6 @@ rule demuxlet_report:
         demuxlet=expand(
             rules.demuxlet.output, run=runs["run_id"].unique(), allow_missing=True
         ),
-        matrix=expand(filtered_mtx, run=runs["run_id"].unique(), allow_missing=True),
     output:
         "{outdir}/demuxlet/demuxlet_report.ipynb",
     conda:
@@ -125,3 +124,14 @@ rule demuxlet_report:
         notebook="{outdir}/demuxlet/demuxlet_report.ipy",
     notebook:
         "../notebooks/demuxlet_report.py.ipynb"
+
+
+rule render_demuxlet_report:
+    input:
+        rules.demuxlet_report.output,
+    output:
+        "{outdir}/demuxlet/demuxlet_report.html",
+    conda:
+        "../envs/jupyter.yaml"
+    shell:
+        "juptyer nbconvert --to html {input} --output {output}"
