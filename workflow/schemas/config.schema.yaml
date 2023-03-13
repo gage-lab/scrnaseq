@@ -14,6 +14,9 @@ properties:
   patientsheet:
     type: string
     description: path to the patientsheet
+  genotypes:
+    type: string
+    description: path to the genotypes file (vcf)
   10x_chemistry:
     type: string
     description: 10x chemistry used
@@ -91,11 +94,11 @@ properties:
       type: array
       description: resolutions to run leiden clustering
 
-
 required:
   - outdir
   - runsheet
   - patientsheet
+  - genotypes
   - 10x_chemistry
   - use_CellBender
   - use_IRescue
