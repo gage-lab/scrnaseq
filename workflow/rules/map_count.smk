@@ -89,17 +89,17 @@ rule STARsolo_report:
     input:
         raw=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
         filtered=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
         summary=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
     output:

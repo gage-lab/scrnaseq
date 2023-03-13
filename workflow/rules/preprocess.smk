@@ -4,19 +4,19 @@ def get_filter_input(wildcards):
     if config["use_CellBender"]:
         i["CellBender"] = expand(
             rules.CellBender.output.filtered,
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         )
     else:
         i["STARsolo"] = expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         )
     if config["use_IRescue"]:
         i["IRescue"] = expand(
             "{outdir}/map_count/{run}/IRescue/matrix.mtx.gz",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         )
     return i
