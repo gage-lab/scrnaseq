@@ -65,25 +65,41 @@ rule STARsolo:
         "../envs/star.yaml"
     params:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
+    log:
+        "{outdir}/map_count/{run}/STARsolo.log",
     script:
         "../scripts/STARsolo.py"
+
+
+rule sambamba_index:
+    input:
+        rules.STARsolo.output.bam,
+    output:
+        "{outdir}/map_count/{run}/Aligned.sortedByCoord.out.bam.bai",
+    log:
+        "{outdir}/map_count/{run}/sambamba_index.log",
+    params:
+        extra="",  # this must be preset
+    threads: 8
+    wrapper:
+        "v1.23.5/bio/sambamba/index"
 
 
 rule STARsolo_report:
     input:
         raw=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/raw/matrix.mtx",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
         filtered=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/filtered/matrix.mtx",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
         summary=expand(
             "{outdir}/map_count/{run}/outs{soloFeatures}/Summary.csv",
-            run=runs["run_id"],
+            run=runs["run_id"].unique(),
             allow_missing=True,
         ),
     output:
@@ -166,6 +182,7 @@ def get_irescue_whitelist(wildcards):
 rule IRescue:
     input:
         bam=rules.STARsolo.output.bam,
+        bai=rules.sambamba_index.output,
         whitelist=get_irescue_whitelist,
     output:
         multiext(
