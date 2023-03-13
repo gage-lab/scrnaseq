@@ -6,10 +6,6 @@ import tempfile, os
 from pathlib import Path
 from snakemake.shell import shell
 
-# create log file
-logfile = str(snakemake.log)
-log = open(logfile, "w")
-
 # setup input fastqs and outdir
 if type(snakemake.input.r1) is str:
     r1 = snakemake.input.r1
@@ -38,8 +34,8 @@ else:
     raise ValueError("Invalid 10x protocol")
 
 # set read command
-print(f"Read 1 file(s): {r1}", file=log)
-print(f"Read 2 file(s): {r2}", file=log)
+print(f"Read 1 file(s): {r1}")
+print(f"Read 2 file(s): {r2}")
 if r1.endswith(".gz"):
     readcmd = "gunzip -c"
 elif r1.endswith(".bz2"):
@@ -68,9 +64,8 @@ else:
 outFilterMultimapNmax = snakemake.config["STARsolo"]["outFilterMultimapNmax"]
 winAnchorMultimapNmax = snakemake.config["STARsolo"]["winAnchorMultimapNmax"]
 
-mem = str(50e9)
+mem = str(50e9)  # use 50 GB of RAM for sorting
 
-log.close()
 with tempfile.TemporaryDirectory() as tmpdir:
     statvfs = os.statvfs(tmpdir)
     if statvfs.f_frsize * statvfs.f_bavail < 2e10:
@@ -98,5 +93,5 @@ with tempfile.TemporaryDirectory() as tmpdir:
         " --limitBAMsortRAM {mem} "
         " --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM"
         " --outSAMtype BAM SortedByCoordinate"
-        " --outFileNamePrefix {outdir} 2> {logfile}"
+        " --outFileNamePrefix {outdir}"
     )
