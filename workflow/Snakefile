@@ -51,6 +51,7 @@ if config["use_Demuxlet"]:
 
 
 include: "rules/preprocess.smk"
+include: "rules/compass.smk"
 
 
 # remove Veloctyo from soloFeatures to prevent expansion
