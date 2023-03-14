@@ -12,9 +12,7 @@ STARsolo:
   winAnchorMultimapNmax: 100
   soloMultiMappers: EM
 
-Demuxlet:
-  activate: false
-
+use_Demuxlet: false
 use_CellBender: false
 use_IRescue: true
 

@@ -25,39 +25,25 @@ def get_filter_input(wildcards):
         )
 
     # add demuxlet if available
-    if "Demuxlet" in config.keys():
-        if config["Demuxlet"]["activate"]:
-            # validate demuxlet config
-            assert (
-                "genotypes" in config.keys()
-            ), "Demuxlet is activated by genotype file is not provided"
-            assert os.path.isfile(config["genotypes"]), (
-                config["genotypes"] + " file does not exist"
-            )
-            assert config["genotypes"].endswith(".vcf"), (
-                config["genotypes"] + " is not a vcf file"
-            )
+    if config["use_Demuxlet"]:
+        # validate demuxlet config
+        assert (
+            "genotypes" in config.keys()
+        ), "Demuxlet is activated by genotype file is not provided"
+        assert os.path.isfile(config["genotypes"]), (
+            config["genotypes"] + " file does not exist"
+        )
+        assert config["genotypes"].endswith(".vcf"), (
+            config["genotypes"] + " is not a vcf file"
+        )
 
-            i["Demuxlet"] = expand(
-                rules.demuxlet.output,
-                run=runs["run_id"].unique(),
-                allow_missing=True,
-            )
-            i["Demuxlet_report"] = rules.demuxlet_report.output
+        i["Demuxlet"] = expand(
+            rules.demuxlet.output,
+            run=runs["run_id"].unique(),
+            allow_missing=True,
+        )
+        i["Demuxlet_report"] = rules.demuxlet_report.output
 
-        elif "cells2invidiuals_map" in config["Demuxlet"].keys():
-            # validate alternative demuxlet config
-            assert os.path.isfile(
-                config["Demuxlet"]["cells2invidiuals_map"]
-            ), "Demuxlet cells2invidiuals_map file does not exist"
-
-            i["Demuxlet_cells2invidiuals_map"] = config["Demuxlet"][
-                "cells2invidiuals_map"
-            ]
-        else:
-            ValueError(
-                "Demuxlet is not activated but no cells2invidiuals_map file is provided"
-            )
     return i
 
 

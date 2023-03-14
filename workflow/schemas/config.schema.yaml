@@ -56,6 +56,9 @@ properties:
           - Uniform
           - PropUnique
           - Rescue
+  use_Demuxlet:
+    type: boolean
+    description: whether to use Demuxlet to demultiplex the 10x data from genotypes
   use_CellBender:
     type: boolean
     description: whether to use CellBender to correct the 10x data
@@ -99,6 +102,7 @@ required:
   - runsheet
   - patientsheet
   - 10x_chemistry
+  - use_Demuxlet
   - use_CellBender
   - use_IRescue
   - preprocess

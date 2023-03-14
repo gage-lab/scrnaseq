@@ -45,7 +45,7 @@ include: "rules/ref.smk"
 include: "rules/map_count.smk"
 
 
-if config["Demuxlet"]["activate"]:
+if config["use_Demuxlet"]:
 
     include: "rules/demuxlet.smk"
 
