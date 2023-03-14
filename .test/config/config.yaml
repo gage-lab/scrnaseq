@@ -24,4 +24,4 @@ preprocess:
     - "n_counts"
     - "percent_mito"
   resolutions:
-    - 1.3
+    - 1.3 # keep this at 1.3 for testing
