@@ -1,0 +1,12 @@
+channels:
+  - ibmdecisionoptimization
+  - conda-forge
+  - bioconda
+  - nodefaults
+dependencies:
+  - python>=3.8
+  - numpy>=1.12
+  - cplex>=12.9
+  - pip
+  - pip:
+      - git+https://github.com/yoseflab/Compass.git
