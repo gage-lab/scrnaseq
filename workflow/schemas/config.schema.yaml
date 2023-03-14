@@ -14,6 +14,9 @@ properties:
   patientsheet:
     type: string
     description: path to the patientsheet
+  genotypes:
+    type: string
+    description: path to the genotypes file (vcf)
   10x_chemistry:
     type: string
     description: 10x chemistry used
@@ -53,6 +56,9 @@ properties:
           - Uniform
           - PropUnique
           - Rescue
+  use_Demuxlet:
+    type: boolean
+    description: whether to use Demuxlet to demultiplex the 10x data from genotypes
   use_CellBender:
     type: boolean
     description: whether to use CellBender to correct the 10x data
@@ -91,12 +97,12 @@ properties:
       type: array
       description: resolutions to run leiden clustering
 
-
 required:
   - outdir
   - runsheet
   - patientsheet
   - 10x_chemistry
+  - use_Demuxlet
   - use_CellBender
   - use_IRescue
   - preprocess

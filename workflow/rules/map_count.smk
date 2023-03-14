@@ -57,16 +57,13 @@ rule STARsolo:
     output:
         **solo_outs,
         bam="{outdir}/map_count/{run}/Aligned.sortedByCoord.out.bam",  # if outSAMtype="BAM SortedByCoordinate"
-        logs=multiext(
-            "{outdir}/map_count/{run}/Log", ".out", ".progress.out", ".final.out"
-        ),
     threads: 32
     conda:
         "../envs/star.yaml"
     params:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
     log:
-        "{outdir}/map_count/{run}/STARsolo.log",
+        multiext("{outdir}/map_count/{run}/Log", ".out", ".progress.out", ".final.out"),
     script:
         "../scripts/STARsolo.py"
 
