@@ -17,11 +17,11 @@ use_CellBender: false
 use_IRescue: true
 
 preprocess:
-  min_counts: 10
-  min_genes: 10
+  min_counts: 1
+  min_genes: 1
   max_pct_mt: 10
   regress_out:
     - "n_counts"
     - "percent_mito"
   resolutions:
-    - 0.5
+    - 1.3
