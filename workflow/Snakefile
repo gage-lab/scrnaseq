@@ -43,7 +43,13 @@ config["istest"] = True if "ngs-test-data" in runs.r1[0] else False
 # include rules in other files
 include: "rules/ref.smk"
 include: "rules/map_count.smk"
-include: "rules/demuxlet.smk"
+
+
+if config["Demuxlet"]["activate"]:
+
+    include: "rules/demuxlet.smk"
+
+
 include: "rules/preprocess.smk"
 
 

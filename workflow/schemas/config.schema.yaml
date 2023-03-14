@@ -98,7 +98,6 @@ required:
   - outdir
   - runsheet
   - patientsheet
-  - genotypes
   - 10x_chemistry
   - use_CellBender
   - use_IRescue

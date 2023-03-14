@@ -1,7 +1,6 @@
 outdir: results
 runsheet: config/runsheet.tsv
 patientsheet: config/patientsheet.tsv
-genotypes:
 
 10x_chemistry: 3prime_v3 # 5prime, 3prime_v3, or 3prime_v2
 STARsolo:
@@ -12,6 +11,9 @@ STARsolo:
   outFilterMultimapNmax: 100
   winAnchorMultimapNmax: 100
   soloMultiMappers: EM
+
+Demuxlet:
+  activate: false
 
 use_CellBender: false
 use_IRescue: true
@@ -25,4 +27,3 @@ preprocess:
     - "percent_mito"
   resolutions:
     - 1.2
-    - 1.3
