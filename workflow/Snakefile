@@ -81,3 +81,8 @@ rule all:
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
+        expand(
+            rules.run_compass.output,
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        ),
