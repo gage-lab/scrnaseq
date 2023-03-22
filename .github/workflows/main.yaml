@@ -49,7 +49,7 @@ jobs:
           miniforge-variant: Mambaforge-pypy3
           miniforge-version: latest
           use-mamba: true
-          python-version: 3.10
+          python-version: 3.9
           channels: conda-forge,bioconda,nodefaults
           channel-priority: strict
           environment-file: environment.yaml
