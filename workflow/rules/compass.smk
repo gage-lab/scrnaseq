@@ -3,26 +3,36 @@ rule prepare_data_for_compass:
     input:
         rules.filter.output.h5ad,
     output:
-        directory("{outdir}/compass/{soloFeatures}_cpm.mtx"),
-        "{outdir}/compass/{soloFeatures}_cpm.mtx/GRCh38-rna/counts.norm.mtx.gz",
-        "{outdir}/compass/{soloFeatures}_cpm.mtx/GRCh38-rna/features.tsv.gz",
-        "{outdir}/compass/{soloFeatures}_cpm.mtx/GRCh38-rna/barcodes.tsv.gz",
-        "{outdir}/compass/{soloFeatures}_cpm.mtx/GRCh38-rna/matrix.mtx.gz",
+        norm="{outdir}/compass/{soloFeatures}/GRCh38-rna/counts.norm.mtx",
+        features="{outdir}/compass/{soloFeatures}/GRCh38-rna/features.tsv",
+        barcodes="{outdir}/compass/{soloFeatures}/GRCh38-rna/barcodes.tsv",
+        counts="{outdir}/compass/{soloFeatures}/GRCh38-rna/matrix.mtx",
     conda:
         "../envs/pegasus.yaml"
+    log:
+        "{outdir}/compass/{soloFeatures}/prepare_data_for_compass.log",
     script:
         "../scripts/prepare_data_for_compass.py"
 
 
+# https://yoseflab.github.io/Compass/tutorial.html
 rule run_compass:
     input:
-        rules.prepare_data_for_compass.output,
+        norm=rules.prepare_data_for_compass.output.norm,
+        features=rules.prepare_data_for_compass.output.features,
+        barcodes=rules.prepare_data_for_compass.output.barcodes,
     output:
         "{outdir}/compass/{soloFeatures}/reactions.tsv.mtx",
+    log:
+        "{outdir}/compass/{soloFeatures}/compass.log",
     conda:
         "../envs/compass.yaml"
+    threads: 8
     shell:
-        "compass --data-mtx {input[1]} {input[2]} {input[3]} --output-dir {wildcards.outdir}/compass/{wildcards.soloFeatures}/ --num-processes 10 --species homo_sapiens"
-
-
-# https://yoseflab.github.io/Compass/tutorial.html
+        """
+        compass \
+            --data-mtx {input.norm} {input.features} {input.barcodes} \
+            --output-dir $(dirname {output}) \
+            --num-processes {threads} \
+            --species homo_sapiens 2> {log}
+        """

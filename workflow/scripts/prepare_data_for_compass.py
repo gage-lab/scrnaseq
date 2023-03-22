@@ -2,18 +2,26 @@
 # Created on: 10/26/22, 1:59 PM
 __author__ = ["Michael Cuoco", "Joelle Faybishenko"]
 
-import numpy as np
-import pandas as pd
+
 import pegasus as pg
-import tempfile, os
+import sys
 from pathlib import Path
+from snakemake.shell import shell
 
-
-# TODO: read data in with pegasus, normalize to counts per million, and save to a mtx file
+sys.stderr = open(snakemake.log[0], "w")
 
 print(f"opening file {snakemake.input[0]}")
 data = pg.read_input(snakemake.input[0])
+
 print("normalize data")
-pg.normalize(data, norm_count=1e6)
-print(f"writing file {snakemake.output[0]}")
-pg.write_output(data, snakemake.output[0], file_type="mtx")
+pg.normalize(data, norm_count=1e5)
+
+outdir = Path(snakemake.output.norm).parent.parent
+print(f"writing files to {outdir}")
+pg.write_output(data, outdir, file_type="mtx")
+
+for file in snakemake.output:
+    print(f"decompressing {file}")
+    shell(f"gunzip {file}.gz")
+
+sys.stderr.close()
