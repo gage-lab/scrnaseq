@@ -30,9 +30,12 @@ rule run_compass:
     threads: 8
     shell:
         """
+        tmpdir=$(mktemp -d -p $(dirname {output}))
         compass \
             --data-mtx {input.norm} {input.features} {input.barcodes} \
             --output-dir $(dirname {output}) \
-            --num-processes {threads} \
+            --microcluster-size 10 \
+            --num-threads {threads} \
+            --temp-dir $tmpdir \
             --species homo_sapiens 2> {log}
         """
