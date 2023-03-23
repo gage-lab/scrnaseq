@@ -1,13 +1,13 @@
 rule install_cplex:
     input:
-        directory(config["Compass"]["cplex"]),
+        config["Compass"]["cplex"] + "/python/setup.py",
     output:
         "resources/cplex_install.done",
     conda:
         "../envs/compass.yaml"
     shell:
         """
-        python {input}/python/setup.py install
+        python {input} install
         touch {output}
         """
 
@@ -29,6 +29,20 @@ rule prepare_data_for_compass:
         "../scripts/prepare_data_for_compass.py"
 
 
+rule compass_precache:
+    input:
+        cplex=rules.install_cplex.output,
+    output:
+        "resources/compass_precache.done",
+    conda:
+        "../envs/compass.yaml"
+    shell:
+        """
+        compass --precache --species homo_sapiens
+        touch {output}
+        """
+
+
 # https://yoseflab.github.io/Compass/tutorial.html
 rule run_compass:
     input:
@@ -36,8 +50,9 @@ rule run_compass:
         features=rules.prepare_data_for_compass.output.features,
         barcodes=rules.prepare_data_for_compass.output.barcodes,
         cplex=rules.install_cplex.output,
+        precache=rules.compass_precache.output,
     output:
-        "{outdir}/compass/{soloFeatures}/reactions.tsv.mtx",
+        "{outdir}/compass/{soloFeatures}/reactions.tsv",
     log:
         "{outdir}/compass/{soloFeatures}/compass.log",
     conda:
