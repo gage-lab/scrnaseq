@@ -1,3 +1,17 @@
+rule install_cplex:
+    input:
+        directory(config["Compass"]["cplex"]),
+    output:
+        "resources/cplex_install.done",
+    conda:
+        "../envs/compass.yaml"
+    shell:
+        """
+        python {input}/python/setup.py install
+        touch {output}
+        """
+
+
 # specify output file in directory
 rule prepare_data_for_compass:
     input:
@@ -21,6 +35,7 @@ rule run_compass:
         norm=rules.prepare_data_for_compass.output.norm,
         features=rules.prepare_data_for_compass.output.features,
         barcodes=rules.prepare_data_for_compass.output.barcodes,
+        cplex=rules.install_cplex.output,
     output:
         "{outdir}/compass/{soloFeatures}/reactions.tsv.mtx",
     log:
@@ -35,7 +50,16 @@ rule run_compass:
             --data-mtx {input.norm} {input.features} {input.barcodes} \
             --output-dir $(dirname {output}) \
             --microcluster-size 10 \
-            --num-threads {threads} \
+            --num-processes {threads} \
             --temp-dir $tmpdir \
             --species homo_sapiens 2> {log}
         """
+
+
+rule compass:
+    input:
+        expand(
+            rules.run_compass.output,
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        ),
