@@ -45,6 +45,10 @@ include: "rules/ref.smk"
 include: "rules/map_count.smk"
 
 
+# remove Veloctyo from soloFeatures to prevent expansion
+if "Velocyto" in config["STARsolo"]["soloFeatures"]:
+    config["STARsolo"]["soloFeatures"].remove("Velocyto")
+
 if config["use_Demuxlet"]:
 
     include: "rules/demuxlet.smk"
@@ -53,12 +57,13 @@ if config["use_Demuxlet"]:
 include: "rules/preprocess.smk"
 
 
-include: "rules/compass.smk"
+if config["Compass"]["use"]:
+    assert "cplex" in config["Compass"], "Path to CPLEX not provided"
+    assert os.path.exists(
+        config["Compass"]["cplex"] + "/python/setup.py"
+    ), "Path to CPLEX does not exist"
 
-
-# remove Veloctyo from soloFeatures to prevent expansion
-if "Velocyto" in config["STARsolo"]["soloFeatures"]:
-    config["STARsolo"]["soloFeatures"].remove("Velocyto")
+    include: "rules/compass.smk"
 
 
 rule all:
@@ -80,11 +85,6 @@ rule all:
         ),
         expand(
             rules.render_cluster_report.output,
-            soloFeatures=config["STARsolo"]["soloFeatures"],
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.run_compass.output,
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
