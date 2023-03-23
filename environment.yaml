@@ -5,7 +5,7 @@ channels:
 dependencies:
   - python>=3.9
   - snakemake>=7.16
-  - snakefmt
+  - snakefmt==0.8.0
   - pandas
   - biopython
   - pre-commit
