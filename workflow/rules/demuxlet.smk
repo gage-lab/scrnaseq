@@ -121,7 +121,7 @@ rule demuxlet_report:
     conda:
         "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/demuxlet/demuxlet_report.ipy",
+        notebook="{outdir}/demuxlet/demuxlet_report.ipynb",
     notebook:
         "../notebooks/demuxlet_report.py.ipynb"
 
