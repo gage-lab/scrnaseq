@@ -75,7 +75,7 @@ rule render_filter_report:
 
 rule integrate:
     input:
-        rules.filter.output.h5ad,
+        rules.filter.output,
     output:
         "{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
     threads: 8
@@ -100,7 +100,7 @@ rule render_integrate_report:
 
 rule cluster:
     input:
-        rules.integrate.output.h5ad,
+        rules.integrate.output,
     output:
         "{outdir}/preprocess/cluster/{soloFeatures}.h5ad",
     threads: 8
