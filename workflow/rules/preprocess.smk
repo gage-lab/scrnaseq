@@ -53,7 +53,6 @@ rule filter:
         unpack(get_filter_input),
     output:
         h5ad="{outdir}/preprocess/filter/{soloFeatures}.h5ad",
-        report="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
     conda:
         "../envs/pegasus.yaml"
     log:
@@ -65,7 +64,7 @@ rule filter:
 
 rule render_filter_report:
     input:
-        rules.filter.output.report,
+        rules.filter.log.notebook,
     output:
         "{outdir}/preprocess/filter/{soloFeatures}_report.html",
     conda:
@@ -78,8 +77,7 @@ rule integrate:
     input:
         rules.filter.output.h5ad,
     output:
-        h5ad="{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
-        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+        "{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
@@ -91,7 +89,7 @@ rule integrate:
 
 rule render_integrate_report:
     input:
-        rules.integrate.output.notebook,
+        rules.integrate.log.notebook,
     output:
         "{outdir}/preprocess/integrate/{soloFeatures}_report.html",
     conda:
@@ -104,8 +102,7 @@ rule cluster:
     input:
         rules.integrate.output.h5ad,
     output:
-        h5ad="{outdir}/preprocess/cluster/{soloFeatures}.h5ad",
-        notebook="{outdir}/preprocess/cluster/{soloFeatures}_report.ipynb",
+        "{outdir}/preprocess/cluster/{soloFeatures}.h5ad",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
@@ -117,7 +114,7 @@ rule cluster:
 
 rule render_cluster_report:
     input:
-        rules.cluster.output.notebook,
+        rules.cluster.log.notebook,
     output:
         "{outdir}/preprocess/cluster/{soloFeatures}_report.html",
     conda:
