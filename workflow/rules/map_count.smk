@@ -126,16 +126,14 @@ rule render_STARsolo_report:
 # check if gpu is available
 rule CellBender:
     input:
-        "{outdir}/map_count/{run}/outs{soloFeatures}/raw/barcodes.tsv",
+        raw="{outdir}/map_count/{run}/outs{soloFeatures}/raw/barcodes.tsv",
+        filtered="{outdir}/map_count/{run}/outs{soloFeatures}/filtered/barcodes.tsv",
     output:
         raw="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.h5",
         filtered="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_filtered.h5",
         pdf="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.pdf",
         barcodes="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_cell_barcodes.csv",
     params:
-        expected_cells=lambda wc: runs[runs["run_id"] == wc.run][
-            "expected_cells"
-        ].unique()[0],
         total_droplets_included=lambda wc: runs[runs["run_id"] == wc.run][
             "total_barcodes"
         ].unique()[0],
@@ -152,13 +150,17 @@ rule CellBender:
         else
             cuda=""
         fi
+        expected=$(wc -l {input.filtered} | tr ' ' '\n' | head -n 1)
 
         # run cellbender
         mkdir -p $(dirname {output.raw})
         cellbender remove-background \
-            --input $(dirname {input}) \
+            --input $(dirname {input.raw}) \
             --output {output.raw} \
-            --expected-cells {params.expected_cells} \
+            --epochs 300 \
+            --learning-rate 0.00001 \
+            --z-dim 50 \
+            --expected-cells $expected \
             --total-droplets-included {params.total_droplets_included} $cuda
         """
 

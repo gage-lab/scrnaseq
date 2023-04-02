@@ -15,21 +15,9 @@ properties:
   total_barcodes:
     type: integer
     description: number of barcodes for background model (45-90k for Standard Chemistry, 4.5-9k for LT) https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-LT
-  cells_loaded:
-    type: integer
-    description: number of cells loaded
-  expected_cells:
-    type: integer
-    description: number of recovered cells expected
-  expected_multiplet_rate:
-    type: number
-    description: multiplet rate (0-1) (refer to 10x documentation for table of expected multiplet rates)
 
 required:
   - run_id
   - r1
   - r2
   - total_barcodes
-  - cells_loaded
-  - expected_cells
-  - expected_multiplet_rate
