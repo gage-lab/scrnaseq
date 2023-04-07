@@ -52,71 +52,49 @@ rule filter:
     input:
         unpack(get_filter_input),
     output:
-        h5ad="{outdir}/preprocess/filter/{soloFeatures}.h5ad",
+        h5ad="{outdir}/preprocess/01_filter/{soloFeatures}.h5ad",
     conda:
         "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/preprocess/filter/{soloFeatures}_report.ipynb",
+        notebook="{outdir}/preprocess/01_filter/{soloFeatures}_report.ipynb",
     threads: 1e3  # force only one to run at a time, to prevent tmpfile conflicts
     notebook:
         "../notebooks/filter.py.ipynb"
-
-
-rule render_filter_report:
-    input:
-        rules.filter.log.notebook,
-    output:
-        "{outdir}/preprocess/filter/{soloFeatures}_report.html",
-    conda:
-        "../envs/jupyter.yaml"
-    shell:
-        "jupyter nbconvert --no-input --to html {input}"
 
 
 rule integrate:
     input:
         rules.filter.output,
     output:
-        "{outdir}/preprocess/integrate/{soloFeatures}.h5ad",
+        "{outdir}/preprocess/02_integrate/{soloFeatures}.h5ad",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/preprocess/integrate/{soloFeatures}_report.ipynb",
+        notebook="{outdir}/preprocess/02_integrate/{soloFeatures}_report.ipynb",
     notebook:
         "../notebooks/integrate.py.ipynb"
-
-
-rule render_integrate_report:
-    input:
-        rules.integrate.log.notebook,
-    output:
-        "{outdir}/preprocess/integrate/{soloFeatures}_report.html",
-    conda:
-        "../envs/jupyter.yaml"
-    shell:
-        "jupyter nbconvert --to html {input}"
 
 
 rule cluster:
     input:
         rules.integrate.output,
     output:
-        "{outdir}/preprocess/cluster/{soloFeatures}.h5ad",
+        "{outdir}/preprocess/03_cluster/{soloFeatures}.h5ad",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
     log:
-        notebook="{outdir}/preprocess/cluster/{soloFeatures}_report.ipynb",
+        notebook="{outdir}/preprocess/03_cluster/{soloFeatures}_report.ipynb",
     notebook:
         "../notebooks/cluster.py.ipynb"
 
 
-rule render_cluster_report:
+rule render_preprocess_reports:
     input:
-        rules.cluster.log.notebook,
+        "{outdir}/preprocess/{stage}/{soloFeatures}_report.ipynb",
     output:
-        "{outdir}/preprocess/cluster/{soloFeatures}_report.html",
+        "{outdir}/preprocess/{stage}/{soloFeatures}_report.html",
     conda:
         "../envs/jupyter.yaml"
     shell:
