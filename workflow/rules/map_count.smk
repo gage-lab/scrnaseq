@@ -118,7 +118,7 @@ rule render_STARsolo_report:
     conda:
         "../envs/jupyter.yaml"
     shell:
-        "jupyter nbconvert --no-input --to html {input}"
+        "jupyter nbconvert --to html {input}"
 
 
 # remove ambient RNA and filter empty droplets
