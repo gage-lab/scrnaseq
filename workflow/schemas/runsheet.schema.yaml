@@ -4,7 +4,6 @@ description: an entry in the sample sheet
 
 properties:
   run_id:
-    type: string
     description: 10x run identifier
   r1:
     type: string
@@ -20,4 +19,3 @@ required:
   - run_id
   - r1
   - r2
-  - total_barcodes

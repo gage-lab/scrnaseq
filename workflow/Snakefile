@@ -20,12 +20,14 @@ validate(config, "schemas/config.schema.yaml")
 
 
 # load runsheet, validate
-runs = pd.read_csv(config["runsheet"], sep="\t")
+runs = pd.read_csv(
+    config["runsheet"], sep="\t", dtype={"run_id": str, "r1": str, "r2": str}
+)
 validate(runs, "schemas/runsheet.schema.yaml")
 runs.set_index("run_id", inplace=True, drop=False)
 
 # load patientsheet, validate
-patients = pd.read_csv(config["patientsheet"], sep="\t")
+patients = pd.read_csv(config["patientsheet"], sep="\t", dtype={"patient_id": str})
 validate(patients, "schemas/patientsheet.schema.yaml")
 patients.set_index("patient_id", inplace=True, drop=False)
 
@@ -49,6 +51,9 @@ if "Velocyto" in config["STARsolo"]["soloFeatures"]:
     config["STARsolo"]["soloFeatures"].remove("Velocyto")
 
 if config["use_Demuxlet"]:
+    assert (
+        "demuxlet_patients" in runs.columns
+    ), "Demuxlet requires demuxlet_patients column in runsheet"
 
     include: "rules/demuxlet.smk"
 

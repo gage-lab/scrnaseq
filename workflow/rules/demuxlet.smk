@@ -18,28 +18,38 @@ else:
 rule prep_vcf:
     input:
         tools=rules.install_popscle_helper_tools.output,
-        bam=expand(
-            rules.STARsolo.output.bam, run=runs["run_id"].unique(), allow_missing=True
-        ),
+        bam=rules.STARsolo.output.bam,
         vcf=config["genotypes"],
     output:
-        "{outdir}/demuxlet/genotypes.vcf",
+        "{outdir}/demuxlet/{run}/genotypes.vcf",
     conda:
         "../envs/picard.yaml"
     log:
-        "{outdir}/demuxlet/prep_vcf.log",
+        "{outdir}/demuxlet/{run}/prep_vcf.log",
+    params:
+        samples=lambda wc: runs.loc[
+            runs["run_id"] == wc.run, "demuxlet_patients"
+        ].values[0],
     shell:
         """
         touch {log} && exec > {log} 2>&1
         source {input.tools}/filter_vcf_file_for_popscle.sh
         check_if_programs_exists
 
-        {input.tools}/sort_vcf_same_as_bam.sh {input.bam[0]} {input.vcf} \
+        tmpvcf=$(mktemp)
+        trap 'rm -f $tmpvcf' EXIT
+
+        # subset samples of interest
+        bcftools view -s {params.samples} -Ou {input.vcf} > $tmpvcf
+
+        {input.tools}/sort_vcf_same_as_bam.sh {input.bam} $tmpvcf \
         | only_keep_snps \
         | calculate_AF_AC_AN_values_based_on_genotype_info \
         | filter_out_mutations_missing_genotype_for_one_or_more_samples \
         | filter_out_mutations_homozygous_reference_in_all_samples \
         | filter_out_mutations_homozygous_in_all_samples > {output}
+
+        rm -f $tmpvcf
         """
 
 
