@@ -53,6 +53,7 @@ rule filter:
         unpack(get_filter_input),
     output:
         h5ad="{outdir}/preprocess/01_filter/{soloFeatures}.h5ad",
+        zarr="{outdir}/preprocess/01_filter/{soloFeatures}.zarr.zip",
     conda:
         "../envs/pegasus.yaml"
     log:
@@ -64,9 +65,10 @@ rule filter:
 
 rule integrate:
     input:
-        rules.filter.output,
+        rules.filter.output.zarr,
     output:
-        "{outdir}/preprocess/02_integrate/{soloFeatures}.h5ad",
+        h5ad="{outdir}/preprocess/02_integrate/{soloFeatures}.h5ad",
+        zarr="{outdir}/preprocess/02_integrate/{soloFeatures}.zarr.zip",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
@@ -78,9 +80,10 @@ rule integrate:
 
 rule cluster:
     input:
-        rules.integrate.output,
+        rules.integrate.output.zarr,
     output:
-        "{outdir}/preprocess/03_cluster/{soloFeatures}.h5ad",
+        h5ad="{outdir}/preprocess/03_cluster/{soloFeatures}.h5ad",
+        zarr="{outdir}/preprocess/03_cluster/{soloFeatures}.zarr.zip",
     threads: 8
     conda:
         "../envs/pegasus.yaml"
