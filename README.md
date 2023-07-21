@@ -65,3 +65,7 @@ snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir" --un
 # IE: stop after the STARsolo
 snakemake all --use-conda -c16 --show-failed-logs --config outdir="$outdir" --until STARsolo
 ```
+
+## TODO:
+
+- [ ] Use different rules to run different stages of pipeline (instead of `all`, use `map_count`, `compass`, `preprocess`, etc.)
