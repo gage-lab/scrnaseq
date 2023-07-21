@@ -7,3 +7,8 @@ logs/**
 .test/results**
 .test/resources**
 *pyc
+config/*tsv
+config/*ipynb
+config/*_config.yaml
+workflow/src/__pycache__
+workflow/src/__pycache__/**
