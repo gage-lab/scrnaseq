@@ -58,9 +58,6 @@ if config["use_Demuxlet"]:
     include: "rules/demuxlet.smk"
 
 
-include: "rules/preprocess.smk"
-
-
 if config["Compass"]["use"]:
     assert "cplex" in config["Compass"], "Path to CPLEX not provided"
     assert os.path.exists(
@@ -74,12 +71,6 @@ rule all:
     input:
         expand(
             rules.render_STARsolo_report.output,
-            soloFeatures=config["STARsolo"]["soloFeatures"],
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.render_preprocess_reports.output,
-            stage=["01_filter", "02_integrate", "03_cluster"],
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
