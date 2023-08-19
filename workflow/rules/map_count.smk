@@ -256,7 +256,7 @@ rule soloTE:
     conda:
         "../envs/solote.yaml"
     log:
-        "results/soloTE/{accession}_SoloTE_output/soloTE.log",
+        "{outdir}/soloTE/{run}_SoloTE_output/soloTE.log",
     threads: 8
     shell:
         """
