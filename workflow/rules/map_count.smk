@@ -267,7 +267,7 @@ rule soloTE:
             --bam {input.bam} \
             --teannotation {input.te_bed} \
             --outputprefix {wildcards.run} \
-            --outputdir $outdir > {log} 2>&1
+            --outputdir $outdir/ > {log} 2>&1
 
         mv {wildcards.run}_SoloTE.stats $outdir/{wildcards.run}_SoloTE_output/
 
