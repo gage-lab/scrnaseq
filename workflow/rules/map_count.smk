@@ -3,7 +3,7 @@ if config["istest"]:
     refdata = {
         "fa": "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa",
         "gtf": "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf",
-        "rmsk_out": "ngs-test-data/scrnaseq_10x_v3/ref/rmsk.chr21.out",
+        "rmsk_out": "ngs-test-data/scrnaseq_10x_v3/ref/rmsk_chr21.out",
     }
     assert os.path.exists(refdata["fa"]), "Test reference genome not found"
     assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
