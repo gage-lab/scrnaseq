@@ -3,11 +3,17 @@ if config["istest"]:
     refdata = {
         "fa": "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa",
         "gtf": "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf",
+        "rmsk_out": "ngs-test-data/scrnaseq_10x_v3/ref/rmsk_chr21.out",
     }
     assert os.path.exists(refdata["fa"]), "Test reference genome not found"
     assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
+    assert os.path.exists(refdata["rmsk_out"]), "Test repeat masker not found"
 else:
-    refdata = {"fa": rules.get_refdata.output.fa, "gtf": rules.get_refdata.output.gtf}
+    refdata = {
+        "fa": rules.get_refdata.output.fa,
+        "gtf": rules.get_refdata.output.gtf,
+        "rmsk_out": rules.get_refdata.output.rmsk_out,
+    }
 
 
 # reindex genome for faster STAR alignment
@@ -204,4 +210,73 @@ rule IRescue:
             --threads {threads} \
             --outdir $(dirname {output[0]}) \
             --whitelist {input.whitelist}
+        """
+
+
+rule clone_soloTE:
+    output:
+        directory("resources/soloTE"),
+    conda:
+        "../envs/solote.yaml"
+    log:
+        "resources/clone_soloTE.log",
+    shell:
+        """
+        git clone https://github.com/bvaldebenitom/SoloTE.git {output} 2> {log}
+
+        # fix bad code on line 321 of SoloTE_1.08/SoloTE_pipeline.py
+        sed -i 's/stdout.split/split/g' {output}/SoloTE_1.08/SoloTE_pipeline.py
+
+        chmod +x {output}/SoloTE_1.08/convertRMOut_to_SoloTEinput.sh
+        """
+
+
+rule soloTE_build:
+    input:
+        rmsk_out=refdata["rmsk_out"],
+        solote=rules.clone_soloTE.output,
+    conda:
+        "../envs/solote.yaml"
+    output:
+        "resources/soloTE_annotation.bed",
+    log:
+        "resources/soloTE_build.log",
+    shell:
+        "{input.solote}/SoloTE_1.08/convertRMOut_to_SoloTEinput.sh {input.rmsk_out} {output} > {log} 2>&1"
+
+
+rule soloTE:
+    input:
+        bam=rules.STARsolo.output.bam,
+        bai=rules.sambamba_index.output,
+        te_bed=rules.soloTE_build.output,
+        solote=rules.clone_soloTE.output,
+    output:
+        multiext(
+            "{outdir}/soloTE/{run}_SoloTE_output/",
+            "barcodes.tsv",
+            "features.tsv",
+            "matrix.mtx",
+            "{run}_SoloTE.stats",
+        ),
+    conda:
+        "../envs/solote.yaml"
+    log:
+        "{outdir}/soloTE/{run}_SoloTE_output/soloTE.log",
+    threads: 8
+    shell:
+        """
+        outdir=$(dirname $(dirname {output[0]}))
+
+        python {input.solote}/SoloTE_1.08/SoloTE_pipeline.py \
+            --threads {threads} \
+            --bam {input.bam} \
+            --teannotation {input.te_bed} \
+            --outputprefix {wildcards.run} \
+            --outputdir $outdir/ > {log} 2>&1
+
+        mv {wildcards.run}_SoloTE.stats $outdir/{wildcards.run}_SoloTE_output/
+
+        # clean up
+        rm -rf $outdir/{wildcards.run}_SoloTE_temp
         """

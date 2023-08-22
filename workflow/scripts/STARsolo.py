@@ -61,6 +61,13 @@ if snakemake.config["STARsolo"].get("soloMultiMappers"):
 else:
     soloMultiMappers = ""
 
+if snakemake.config["STARsolo"].get("outSAMmultNmax"):
+    outSAMmultNmax = "--outSAMmultNmax " + str(
+        snakemake.config["STARsolo"]["outSAMmultNmax"]
+    )
+else:
+    outSAMmultNmax = ""
+
 outFilterMultimapNmax = snakemake.config["STARsolo"]["outFilterMultimapNmax"]
 winAnchorMultimapNmax = snakemake.config["STARsolo"]["winAnchorMultimapNmax"]
 
@@ -82,6 +89,7 @@ with tempfile.TemporaryDirectory() as tmpdir:
         " {solo10xProtocol}"
         " {soloBarcodeReadLength}"
         " {soloMultiMappers}"
+        " {outSAMmultNmax}"
         " --soloFeatures {snakemake.params.soloFeatures}"
         " --soloCellFilter EmptyDrops_CR"
         " --soloCBwhitelist {snakemake.input.whitelist}"

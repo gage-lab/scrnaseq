@@ -10,7 +10,7 @@ STARsolo:
     - Velocyto
   outFilterMultimapNmax: 100
   winAnchorMultimapNmax: 100
-  soloMultiMappers: EM
+  outSAMmultNmax: 1
 
 use_Demuxlet: false
 use_CellBender: false

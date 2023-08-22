@@ -33,12 +33,11 @@ jobs:
         with:
           lfs: true
           submodules: recursive
-      - name: Snakemake cache
-        id: cache-sm
+      - name: Cache test data
         uses: actions/cache@v3
         with:
-          path: .test/ngs-test-data
-          key: ${{ runner.os }}-sm
+          path: .test/ngs-test-data/scrnaseq_10x_v3
+          key: ${{ hashFiles('.test/ngs-test-data/rules/scrnaseq_10x_v3.smk') }}
       - name: Setup Singularity
         uses: eWaterCycle/setup-singularity@v7
         with:
