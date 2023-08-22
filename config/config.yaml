@@ -11,7 +11,7 @@ STARsolo:
     - Velocyto
   outFilterMultimapNmax: 100
   winAnchorMultimapNmax: 100
-  outSAMmultNmax: 1 # EM, Uniform, PropUnique, or Rescue
+  outSAMmultNmax: 1
 
 # CellBender is used to remove ambient RNA
 # Runs very slowly without GPU
