@@ -74,8 +74,8 @@ rule all:
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
-        expand(
-            rules.soloTE.output,
-            run=runs["run_id"].unique(),
-            outdir=config["outdir"],
-        ),
+        # expand(
+        #     rules.soloTE.output,
+        #     run=runs["run_id"].unique(),
+        #     outdir=config["outdir"],
+        # ),

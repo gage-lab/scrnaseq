@@ -221,28 +221,24 @@ rule clone_soloTE:
     log:
         "resources/clone_soloTE.log",
     shell:
-        """
-        git clone https://github.com/bvaldebenitom/SoloTE.git {output} 2> {log}
-
-        # fix bad code on line 321 of SoloTE_1.08/SoloTE_pipeline.py
-        sed -i 's/stdout.split/split/g' {output}/SoloTE_1.08/SoloTE_pipeline.py
-
-        chmod +x {output}/SoloTE_1.08/convertRMOut_to_SoloTEinput.sh
-        """
+        "git clone https://github.com/bvaldebenitom/SoloTE.git {output} 2> {log}"
 
 
 rule soloTE_build:
     input:
-        rmsk_out=refdata["rmsk_out"],
-        solote=rules.clone_soloTE.output,
+        rules.clone_soloTE.output,
     conda:
         "../envs/solote.yaml"
     output:
         "resources/soloTE_annotation.bed",
     log:
         "resources/soloTE_build.log",
+    shadow:
+        "shallow"
     shell:
-        "{input.solote}/SoloTE_1.08/convertRMOut_to_SoloTEinput.sh {input.rmsk_out} {output} > {log} 2>&1"
+        """
+        python {input}/SoloTE_RepeatMasker_to_BED.py -g hg38 && mv hg38_rmsk.bed {output} 2> {log}
+        """
 
 
 rule soloTE:
@@ -268,7 +264,7 @@ rule soloTE:
         """
         outdir=$(dirname $(dirname {output[0]}))
 
-        python {input.solote}/SoloTE_1.08/SoloTE_pipeline.py \
+        python {input.solote}/SoloTE_pipeline.py \
             --threads {threads} \
             --bam {input.bam} \
             --teannotation {input.te_bed} \
