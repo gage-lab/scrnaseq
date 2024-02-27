@@ -31,18 +31,18 @@ rule get_refdata:
         """
 
 
-# download barcode whitelist from 10x Genomics
+# download barcode whitelist from Teichlab
 if config["10x_chemistry"] == "3prime_v3":
     whitelist_input = (
         HTTP.remote(
-            "https://github.com/10XGenomics/cellranger/raw/master/lib/python/cellranger/barcodes/3M-february-2018.txt.gz",
+            "https://teichlab.github.io/scg_lib_structs/data/3M-february-2018.txt.gz",
             static=True,
         ),
     )
 elif config["10x_chemistry"] == "3prime_v2" or "5prime":
     whitelist_input = (
         HTTP.remote(
-            "https://github.com/10XGenomics/cellranger/raw/master/lib/python/cellranger/barcodes/737K-august-2016.txt",
+            "https://teichlab.github.io/scg_lib_structs/data/737K-august-2016.txt.gz",
             static=True,
         ),
     )
@@ -54,10 +54,4 @@ rule get_whitelist:
     output:
         "resources/10x_whitelist.txt",
     shell:
-        """
-        if [[ {input} == *.gz ]]; then
-            gunzip -c {input} > {output}
-        else
-            cp {input} {output}
-        fi
-        """
+        "gunzip -c {input} > {output}"
