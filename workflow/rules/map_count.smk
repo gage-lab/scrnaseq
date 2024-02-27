@@ -36,18 +36,18 @@ rule STARindex:
 # setup STARsolo output
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
-    solo_outs[f"{f}_summary"] = f"{{outdir}}/map_count/{{run}}/outs{f}/Summary.csv"
+    solo_outs[f"{f}_summary"] = "{outdir}/map_count/{run}/outs" + f + "/Summary.csv"
     for d in ["raw", "filtered"]:
         if f != "Velocyto":
             solo_outs[f"{f}_{d}"] = multiext(
-                f"{{outdir}}/map_count/{{run}}/outs{f}/{d}/",
+                "{outdir}/map_count/{run}/outs" + f + "/" + d + "/",
                 "barcodes.tsv",
                 "genes.tsv",
                 "matrix.mtx",
             )
         else:
             solo_outs[f"{f}_{d}"] = multiext(
-                f"{{outdir}}/map_count/{{run}}/outs{f}/{d}/",
+                "{outdir}/map_count/{run}/outs" + f + "/" + d + "/",
                 "ambiguous.mtx",
                 "spliced.mtx",
                 "unspliced.mtx",
