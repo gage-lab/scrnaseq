@@ -7,7 +7,7 @@ dependencies:
   - snakemake=8.26
   - snakemake-storage-plugin-ftp
   - snakemake-storage-plugin-http
-  - snakefmt==0.8.0
+  - snakefmt>=0.10.0
   - pandas
   - biopython
   - pre-commit
