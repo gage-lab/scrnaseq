@@ -21,7 +21,7 @@ rule STARindex:
     input:
         **refdata,
     output:
-        protected(directory("resources/STARsolo")),
+        protected(sdirectory("resources/STARsolo")),
     threads: 8
     conda:
         "../envs/star.yaml"
@@ -113,7 +113,7 @@ rule STARsolo_report:
     log:
         notebook="{outdir}/map_count/{soloFeatures}_report.ipynb",
     conda:
-        "../envs/pegasus.yaml"
+        "../envs/pegasus.lock.yaml"
     threads: 1e3
     notebook:
         "../notebooks/STARsolo_report.py.ipynb"
@@ -148,9 +148,11 @@ rule CellBender:
         ].unique()[0],
     conda:
         # use CUDA if GPU is present
-        "../envs/cellbender_cuda.yaml" if shutil.which(
-        "nvidia-smi"
-        ) else "../envs/cellbender.yaml"
+        (
+            "../envs/cellbender_cuda.yaml"
+            if shutil.which("nvidia-smi")
+            else "../envs/cellbender.yaml"
+        )
     shell:
         """
         # use CUDA if GPU is present
