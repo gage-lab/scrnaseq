@@ -12,3 +12,5 @@ config/*ipynb
 config/*_config.yaml
 workflow/src/__pycache__
 workflow/src/__pycache__/**
+.cache/*
+.conda/*
