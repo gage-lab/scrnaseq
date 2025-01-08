@@ -81,6 +81,7 @@ rule dsc_pileup:
         "../envs/demuxlet.yaml"
     log:
         "{outdir}/demuxlet/{run}/dsc_pileup.log",
+    threads: 100  # never run this rule more than one at a time
     shell:
         """
         touch {log} && exec > {log} 2>&1
@@ -106,6 +107,7 @@ rule demuxlet:
         "../envs/demuxlet.yaml"
     log:
         "{outdir}/demuxlet/{run}/demuxlet.log",
+    threads: 100  # never run this rule more than one at a time
     shell:
         """
         touch {log} && exec > {log} 2>&1
@@ -144,4 +146,4 @@ rule render_demuxlet_report:
     conda:
         "../envs/jupyter.yaml"
     shell:
-        "juptyer nbconvert --to html {input} --output {output}"
+        "jupyter nbconvert --to html {input} --output {output}"
