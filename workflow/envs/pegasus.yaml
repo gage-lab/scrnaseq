@@ -10,4 +10,8 @@ dependencies:
   - scrublet
   - scanorama
   - plotly
-  - pegasuspy
+  - pandas>=1.5.1
+  - pegasuspy>=1.10.0
+  - scanpy
+  - r-seurat>=4
+  - rpy2
