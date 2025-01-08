@@ -37,21 +37,24 @@ rule STARindex:
 solo_outs = {}
 for f in config["STARsolo"]["soloFeatures"]:
     solo_outs[f"{f}_summary"] = "{outdir}/map_count/{run}/outs" + f + "/Summary.csv"
-    for d in ["raw", "filtered"]:
-        if f != "Velocyto":
+    if f != "Velocyto":
+        for d in ["raw", "filtered"]:
             solo_outs[f"{f}_{d}"] = multiext(
                 "{outdir}/map_count/{run}/outs" + f + "/" + d + "/",
                 "barcodes.tsv",
                 "genes.tsv",
                 "matrix.mtx",
             )
-        else:
-            solo_outs[f"{f}_{d}"] = multiext(
-                "{outdir}/map_count/{run}/outs" + f + "/" + d + "/",
-                "ambiguous.mtx",
-                "spliced.mtx",
-                "unspliced.mtx",
-            )
+    else:
+        d = "raw"
+        solo_outs[f"{f}_{d}"] = multiext(
+            "{outdir}/map_count/{run}/outs" + f + "/" + d + "/",
+            "barcodes.tsv",
+            "genes.tsv",
+            "ambiguous.mtx",
+            "spliced.mtx",
+            "unspliced.mtx",
+        )
 
 
 rule STARsolo:
@@ -191,7 +194,7 @@ rule IRescue:
         whitelist=get_irescue_whitelist,
     output:
         multiext(
-            "{outdir}/map_count/{run}/IRescue/",
+            "{outdir}/map_count/{run}/IRescue/counts/",
             "barcodes.tsv.gz",
             "features.tsv.gz",
             "matrix.mtx.gz",
@@ -199,17 +202,18 @@ rule IRescue:
     params:
         genome="hg38",
     threads: 8
+    log:
+        "{outdir}/map_count/{run}/IRescue.log",
     conda:
         "../envs/irescue.yaml"
     shell:
         """
         irescue \
             --bam {input.bam} \
-            --tmpdir IRescue_tmp_{wildcards.run} \
             --genome {params.genome} \
             --threads {threads} \
-            --outdir $(dirname {output[0]}) \
-            --whitelist {input.whitelist}
+            --outdir $(dirname $(dirname {output[0]})) \
+            --whitelist {input.whitelist} > {log} 2>&1
         """
 
 
