@@ -21,7 +21,7 @@ rule STARindex:
     input:
         **refdata,
     output:
-        protected(sdirectory("resources/STARsolo")),
+        protected(directory("resources/STARsolo")),
     threads: 8
     conda:
         "../envs/star.yaml"
