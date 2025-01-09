@@ -43,15 +43,14 @@ jobs:
         with:
           singularity-version: 3.8.3
       - name: Install Mamba
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge-pypy3
           miniforge-version: latest
           use-mamba: true
-          python-version: 3.9
+          python-version: 3.12
           channels: conda-forge,bioconda,nodefaults
           channel-priority: strict
-          environment-file: environment.yaml
+          environment-file: conda.yaml
       - name: Generate test data
         run: cd .test/ngs-test-data && snakemake scrnaseq_10x_v3 --use-conda --cores 2 --conda-cleanup-pkgs cache
       - name: Run workflow

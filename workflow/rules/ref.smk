@@ -1,27 +1,16 @@
-from snakemake.remote import HTTP, FTP
-
-HTTP = HTTP.RemoteProvider()
-FTP = FTP.RemoteProvider()
-
-
 # download reference genome fasta and gene annotation from 10x Genomics
 rule get_refdata:
     input:
-        ref10x=HTTP.remote(
+        ref10x=storage(
             "https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz",
-            static=True,
         ),
-        rmsk_out=FTP.remote(
+        rmsk_out=storage(
             "https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.out.gz",
-            keep_local=True,
-            static=True,
         ),
     output:
         fa="resources/genome.fa",
         gtf="resources/genes.gtf",
         rmsk_out="resources/rmsk.out",
-    shadow:
-        "minimal"
     shell:
         """
         tar -xf {input.ref10x} --wildcards '*genome.fa' '*genes.gtf'
@@ -33,24 +22,16 @@ rule get_refdata:
 
 # download barcode whitelist from Teichlab
 if config["10x_chemistry"] == "3prime_v3":
-    whitelist_input = (
-        HTTP.remote(
-            "https://teichlab.github.io/scg_lib_structs/data/3M-february-2018.txt.gz",
-            static=True,
-        ),
-    )
+    whitelist_input = "https://github.com/Teichlab/scg_lib_structs/raw/refs/heads/master/data/10X-Genomics/3M-february-2018.txt.gz"
 elif config["10x_chemistry"] == "3prime_v2" or "5prime":
-    whitelist_input = (
-        HTTP.remote(
-            "https://teichlab.github.io/scg_lib_structs/data/737K-august-2016.txt.gz",
-            static=True,
-        ),
-    )
+    whitelist_input = "https://github.com/Teichlab/scg_lib_structs/raw/refs/heads/master/data/10X-Genomics/737K-august-2016.txt.gz"
+else:
+    ValueError("10x_chemistry must be 3prime_v2, 3prime_v3, or 5prime")
 
 
 rule get_whitelist:
     input:
-        whitelist_input,
+        storage(whitelist_input),
     output:
         "resources/10x_whitelist.txt",
     shell:
