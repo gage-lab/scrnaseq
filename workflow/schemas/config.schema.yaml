@@ -17,6 +17,15 @@ properties:
   genotypes:
     type: string
     description: path to the genotypes file (vcf)
+  genome:
+    type: string
+    description: path to the genome file (fasta)
+  genes:
+    type: string
+    description: path to the gtf file (gtf)
+  rmsk:
+    type: string
+    description: path to the repeatmasker file (.out)
   10x_chemistry:
     type: string
     description: 10x chemistry used
@@ -107,3 +116,6 @@ required:
   - use_Demuxlet
   - use_CellBender
   - use_IRescue
+  - genome
+  - genes
+  - rmsk

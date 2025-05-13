@@ -1,19 +1,8 @@
-# use test reference data if test fastqs are used
-if config["istest"]:
-    refdata = {
-        "fa": "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa",
-        "gtf": "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf",
-        "rmsk_out": "ngs-test-data/scrnaseq_10x_v3/ref/rmsk_chr21.out",
-    }
-    assert os.path.exists(refdata["fa"]), "Test reference genome not found"
-    assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
-    assert os.path.exists(refdata["rmsk_out"]), "Test repeat masker not found"
-else:
-    refdata = {
-        "fa": rules.get_refdata.output.fa,
-        "gtf": rules.get_refdata.output.gtf,
-        "rmsk_out": rules.get_refdata.output.rmsk_out,
-    }
+refdata = {"fa": config["genome"], "gtf": config["genes"], "rmsk_out": config["rmsk"]}
+
+assert os.path.exists(refdata["fa"]), "Test reference genome not found"
+assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
+assert os.path.exists(refdata["rmsk_out"]), "Test repeat masker not found"
 
 
 # reindex genome for faster STAR alignment
@@ -27,8 +16,20 @@ rule STARindex:
         "../envs/star.yaml"
     params:
         genomeSAindexNbases=11 if config["istest"] else 14,
+        gff=(
+            "--sjdbGTFtagExonParentTranscript Parent"
+            if refdata["gtf"].contains(".gff")
+            else ""
+        ),
     shell:
-        "STAR --runMode genomeGenerate --runThreadN {threads} --genomeDir {output} --genomeFastaFiles {input.fa} --sjdbGTFfile {input.gtf} --genomeSAindexNbases {params.genomeSAindexNbases}"
+        """
+        STAR \
+            --runMode genomeGenerate \
+            --runThreadN {threads} \
+            --genomeDir {output} \
+            --genomeFastaFiles {input.fa} \
+            --sjdbGTFfile {input.gtf} {params.gff} \--genomeSAindexNbases {params.genomeSAindexNbases}
+        """
 
 
 # map and count
