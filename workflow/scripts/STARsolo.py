@@ -2,7 +2,6 @@
 # Created on: 10/26/22, 1:59 PM
 __author__ = "Michael Cuoco"
 
-import tempfile, os
 from pathlib import Path
 from snakemake.shell import shell
 
@@ -73,33 +72,26 @@ winAnchorMultimapNmax = snakemake.config["STARsolo"]["winAnchorMultimapNmax"]
 
 mem = str(50e9)  # use 50 GB of RAM for sorting
 
-with tempfile.TemporaryDirectory() as tmpdir:
-    statvfs = os.statvfs(tmpdir)
-    if statvfs.f_frsize * statvfs.f_bavail < 2e10:
-        print(
-            "WARNING: Less than 20 GB of free disk space detected at tmpdir location. STAR may fail due to lack of disk space. Set $TMPDIR to a location with more free space."
-        )
-    shell(
-        "STAR "
-        " --runThreadN {snakemake.threads}"
-        " --genomeDir {snakemake.input.idx}"
-        " --readFilesCommand {readcmd}"
-        " {readFilesIn}"
-        " --soloType CB_UMI_Simple"
-        " {solo10xProtocol}"
-        " {soloBarcodeReadLength}"
-        " {soloMultiMappers}"
-        " {outSAMmultNmax}"
-        " --soloFeatures {snakemake.params.soloFeatures}"
-        " --soloCellFilter EmptyDrops_CR"
-        " --soloCBwhitelist {snakemake.input.whitelist}"
-        " --soloOutFormatFeaturesGeneField3 -"
-        " --outTmpDir {tmpdir}/STARtmp"
-        " --soloOutFileNames outs genes.tsv barcodes.tsv matrix.mtx"
-        " --outFilterMultimapNmax {outFilterMultimapNmax}"
-        " --winAnchorMultimapNmax {winAnchorMultimapNmax}"
-        " --limitBAMsortRAM {mem} "
-        " --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM"
-        " --outSAMtype BAM SortedByCoordinate"
-        " --outFileNamePrefix {outdir}"
-    )
+shell(
+    "STAR "
+    " --runThreadN {snakemake.threads}"
+    " --genomeDir {snakemake.input.idx}"
+    " --readFilesCommand {readcmd}"
+    " {readFilesIn}"
+    " --soloType CB_UMI_Simple"
+    " {solo10xProtocol}"
+    " {soloBarcodeReadLength}"
+    " {soloMultiMappers}"
+    " {outSAMmultNmax}"
+    " --soloFeatures {snakemake.params.soloFeatures}"
+    " --soloCellFilter EmptyDrops_CR"
+    " --soloCBwhitelist {snakemake.input.whitelist}"
+    " --soloOutFormatFeaturesGeneField3 -"
+    " --soloOutFileNames outs genes.tsv barcodes.tsv matrix.mtx"
+    " --outFilterMultimapNmax {outFilterMultimapNmax}"
+    " --winAnchorMultimapNmax {winAnchorMultimapNmax}"
+    " --limitBAMsortRAM {mem} "
+    " --outSAMattributes NH HI nM AS CR UR CB UB GX GN sS sQ sM"
+    " --outSAMtype BAM SortedByCoordinate"
+    " --outFileNamePrefix {outdir}"
+)
