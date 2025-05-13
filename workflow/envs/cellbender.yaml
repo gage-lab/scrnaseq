@@ -1,13 +1,6 @@
 channels:
-  - pytorch
   - conda-forge
   - bioconda
-  - nodefaults
+  - defaults
 dependencies:
-  - python=3.7
-  - pip
-  - pytables
-  - pytorch
-  - torchvision
-  - pip:
-      - "--editable=git+https://github.com/broadinstitute/CellBender.git#egg=CellBender"
+  - cellbender>=0.3.2
