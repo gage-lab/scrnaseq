@@ -23,9 +23,6 @@ properties:
   genes:
     type: string
     description: path to the gtf file (gtf)
-  rmsk:
-    type: string
-    description: path to the repeatmasker file (.out)
   10x_chemistry:
     type: string
     description: 10x chemistry used
@@ -118,4 +115,3 @@ required:
   - use_IRescue
   - genome
   - genes
-  - rmsk

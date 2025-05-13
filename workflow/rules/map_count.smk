@@ -1,10 +1,3 @@
-refdata = {"fa": config["genome"], "gtf": config["genes"], "rmsk_out": config["rmsk"]}
-
-assert os.path.exists(refdata["fa"]), "Test reference genome not found"
-assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
-assert os.path.exists(refdata["rmsk_out"]), "Test repeat masker not found"
-
-
 # reindex genome for faster STAR alignment
 rule STARindex:
     input:
@@ -18,7 +11,7 @@ rule STARindex:
         genomeSAindexNbases=11 if config["istest"] else 14,
         gff=(
             "--sjdbGTFtagExonParentTranscript Parent"
-            if refdata["gtf"].contains(".gff")
+            if ".gff" in refdata["gtf"]
             else ""
         ),
     shell:
@@ -174,112 +167,4 @@ rule CellBender:
             --z-dim 50 \
             --expected-cells $expected \
             --total-droplets-included {params.total_droplets_included} $cuda
-        """
-
-
-# quantify transposable element expression
-# https://github.com/bodegalab/irescue
-# https://www.biorxiv.org/content/10.1101/2022.09.16.508229v2.full
-def get_irescue_whitelist(wildcards):
-    key = "GeneFull" if "GeneFull" in config["STARsolo"]["soloFeatures"] else "Gene"
-    if config["use_CellBender"]:
-        return expand(
-            rules.CellBender.output.barcodes, soloFeatures=key, allow_missing=True
-        )
-    else:
-        return f"{{outdir}}/map_count/{{run}}/outs{key}/filtered/barcodes.tsv"
-
-
-rule IRescue:
-    input:
-        bam=rules.STARsolo.output.bam,
-        bai=rules.sambamba_index.output,
-        whitelist=get_irescue_whitelist,
-    output:
-        multiext(
-            "{outdir}/map_count/{run}/IRescue/counts/",
-            "barcodes.tsv.gz",
-            "features.tsv.gz",
-            "matrix.mtx.gz",
-        ),
-    params:
-        genome="hg38",
-    threads: 8
-    log:
-        "{outdir}/map_count/{run}/IRescue.log",
-    conda:
-        "../envs/irescue.yaml"
-    shell:
-        """
-        irescue \
-            --bam {input.bam} \
-            --genome {params.genome} \
-            --threads {threads} \
-            --outdir $(dirname $(dirname {output[0]})) \
-            --whitelist {input.whitelist} > {log} 2>&1
-        """
-
-
-rule clone_soloTE:
-    output:
-        directory("resources/soloTE"),
-    conda:
-        "../envs/solote.yaml"
-    log:
-        "resources/clone_soloTE.log",
-    shell:
-        "git clone https://github.com/bvaldebenitom/SoloTE.git {output} 2> {log}"
-
-
-rule soloTE_build:
-    input:
-        rules.clone_soloTE.output,
-    conda:
-        "../envs/solote.yaml"
-    output:
-        "resources/soloTE_annotation.bed",
-    log:
-        "resources/soloTE_build.log",
-    shadow:
-        "shallow"
-    shell:
-        """
-        python {input}/SoloTE_RepeatMasker_to_BED.py -g hg38 && mv hg38_rmsk.bed {output} 2> {log}
-        """
-
-
-rule soloTE:
-    input:
-        bam=rules.STARsolo.output.bam,
-        bai=rules.sambamba_index.output,
-        te_bed=rules.soloTE_build.output,
-        solote=rules.clone_soloTE.output,
-    output:
-        multiext(
-            "{outdir}/soloTE/{run}_SoloTE_output/",
-            "barcodes.tsv",
-            "features.tsv",
-            "matrix.mtx",
-            "{run}_SoloTE.stats",
-        ),
-    conda:
-        "../envs/solote.yaml"
-    log:
-        "{outdir}/soloTE/{run}_SoloTE_output/soloTE.log",
-    threads: 8
-    shell:
-        """
-        outdir=$(dirname $(dirname {output[0]}))
-
-        python {input.solote}/SoloTE_pipeline.py \
-            --threads {threads} \
-            --bam {input.bam} \
-            --teannotation {input.te_bed} \
-            --outputprefix {wildcards.run} \
-            --outputdir $outdir/ > {log} 2>&1
-
-        mv {wildcards.run}_SoloTE.stats $outdir/{wildcards.run}_SoloTE_output/
-
-        # clean up
-        rm -rf $outdir/{wildcards.run}_SoloTE_temp
         """

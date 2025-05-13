@@ -16,14 +16,6 @@ def get_filter_input(wildcards):
             allow_missing=True,
         )
 
-    # add TE count matrix if available
-    if config["use_IRescue"]:
-        i["IRescue"] = expand(
-            "{outdir}/map_count/{run}/IRescue/counts/matrix.mtx.gz",
-            run=runs["run_id"].unique(),
-            allow_missing=True,
-        )
-
     # add demuxlet if available
     if config["use_Demuxlet"]:
         # validate demuxlet config

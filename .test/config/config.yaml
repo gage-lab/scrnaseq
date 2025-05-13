@@ -14,7 +14,6 @@ STARsolo:
 
 genome:  "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa"
 genes: "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf"
-rmsk: "ngs-test-data/scrnaseq_10x_v3/ref/rmsk_chr21.out"
 
 use_Demuxlet: false
 use_CellBender: false
