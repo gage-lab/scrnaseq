@@ -9,7 +9,7 @@ import pandas as pd
 from snakemake.utils import min_version, validate
 
 ##### set minimum snakemake version #####
-min_version("7.16.0")
+min_version("8.0.0")
 
 
 # define configfile, validate
@@ -71,7 +71,27 @@ if ("Compass" in config) and config["Compass"]["use"]:
 rule all:
     input:
         expand(
+            rules.STARsolo.output,
+            run=runs["run_id"].unique(),
+            outdir=config["outdir"],
+        ),
+        expand(
+            rules.sambamba_index.output,
+            run=runs["run_id"].unique(),
+            outdir=config["outdir"],
+        ),
+        expand(
             rules.render_STARsolo_report.output,
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        ),
+        expand(
+            rules.render_demuxlet_report.output,
+            outdir=config["outdir"],
+        ),
+        expand(
+            rules.render_preprocess_reports.output,
+            stage=["01_filter"],
             soloFeatures=config["STARsolo"]["soloFeatures"],
             outdir=config["outdir"],
         ),
