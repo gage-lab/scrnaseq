@@ -51,12 +51,29 @@ include: "rules/preprocess.smk"
 if "Velocyto" in config["STARsolo"]["soloFeatures"]:
     config["STARsolo"]["soloFeatures"].remove("Velocyto")
 
+# setup output
+output = []
+output.append(
+    expand(
+        rules.render_STARsolo_report.output,
+        soloFeatures=config["STARsolo"]["soloFeatures"],
+        outdir=config["outdir"],
+    )
+)
+
 if config["use_Demuxlet"]:
     assert (
         "demuxlet_patients" in runs.columns
     ), "Demuxlet requires demuxlet_patients column in runsheet"
 
     include: "rules/demuxlet.smk"
+
+    output.append(
+        expand(
+            rules.render_demuxlet_report.output,
+            outdir=config["outdir"],
+        )
+    )
 
 
 if ("Compass" in config) and config["Compass"]["use"]:
@@ -67,46 +84,15 @@ if ("Compass" in config) and config["Compass"]["use"]:
 
     include: "rules/compass.smk"
 
+    output.append(
+        expand(
+            rules.run_compass.output,
+            soloFeatures=config["STARsolo"]["soloFeatures"],
+            outdir=config["outdir"],
+        )
+    )
+
 
 rule all:
     input:
-        expand(
-            rules.STARsolo.output,
-            run=runs["run_id"].unique(),
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.sambamba_index.output,
-            run=runs["run_id"].unique(),
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.render_STARsolo_report.output,
-            soloFeatures=config["STARsolo"]["soloFeatures"],
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.render_demuxlet_report.output,
-            outdir=config["outdir"],
-        ),
-        expand(
-            rules.render_preprocess_reports.output,
-            stage=["01_filter"],
-            soloFeatures=config["STARsolo"]["soloFeatures"],
-            outdir=config["outdir"],
-        ),
-        # expand(
-        #     rules.render_demuxlet_report.output,
-        #     outdir=config["outdir"],
-        # ),
-        # expand(
-        #     rules.render_preprocess_reports.output,
-        #     stage=["01_filter"],
-        #     soloFeatures=config["STARsolo"]["soloFeatures"],
-        #     outdir=config["outdir"],
-        # )
-        # expand(
-        #     rules.soloTE.output,
-        #     run=runs["run_id"].unique(),
-        #     outdir=config["outdir"],
-        # ),
+        output,
