@@ -29,6 +29,8 @@ jobs:
     needs:
       - Formatting
     steps:
+      - name: Install mail
+        run: sudo apt-get install mail
       - uses: actions/checkout@v3
         with:
           lfs: true

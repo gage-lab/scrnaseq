@@ -13,4 +13,3 @@ dependencies:
   - pre-commit
   - gh
   - ipykernel
-  - mail
