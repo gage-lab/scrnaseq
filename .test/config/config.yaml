@@ -12,9 +12,12 @@ STARsolo:
   winAnchorMultimapNmax: 100
   outSAMmultNmax: 1
 
+genome:  "ngs-test-data/scrnaseq_10x_v3/ref/genome.chr21.fa"
+genes: "ngs-test-data/scrnaseq_10x_v3/ref/genes.chr21.gtf"
+
 use_Demuxlet: false
 use_CellBender: false
-use_IRescue: true
+use_IRescue: false
 Compass:
   use: False
 

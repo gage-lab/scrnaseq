@@ -40,6 +40,11 @@ shutil.copy(config["patientsheet"], config["outdir"])
 # indicator variable for if this run is a test or not
 config["istest"] = True if "ngs-test-data" in runs.r1[0] else False
 
+refdata = {"fa": config["genome"], "gtf": config["genes"]}
+
+assert os.path.exists(refdata["fa"]), "Test reference genome not found"
+assert os.path.exists(refdata["gtf"]), "Test reference annotation not found"
+
 
 # include rules in other files
 include: "rules/ref.smk"
