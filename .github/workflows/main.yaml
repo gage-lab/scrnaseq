@@ -30,7 +30,7 @@ jobs:
       - Formatting
     steps:
       - name: Install mail
-        run: apt-get install mailutils
+        run: sudo apt-get install mailutils
       - uses: actions/checkout@v3
         with:
           lfs: true
