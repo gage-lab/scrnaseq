@@ -101,13 +101,13 @@ if ("Compass" in config) and config["Compass"]["use"]:
 onsuccess:
     message = "Workflow finished, no error"
     print(message)
-    shell("mail -s " + message + " " + config["mail"] + " < {log}")
+    shell("mail -s " + message + " " + config["email"] + " < {log}")
 
 
 onerror:
     message = "Workflow failed, error"
     print(message)
-    shell("mail -s " + message + " " + config["mail"] + " < {log}")
+    shell("mail -s " + message + " " + config["email"] + " < {log}")
 
 
 rule all:
