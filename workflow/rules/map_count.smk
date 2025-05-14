@@ -3,7 +3,7 @@ rule STARindex:
     input:
         **refdata,
     output:
-        protected(directory("resources/STARsolo")),
+        directory("resources/STARsolo"),
     threads: 8
     conda:
         "../envs/star.yaml"
@@ -21,7 +21,8 @@ rule STARindex:
             --runThreadN {threads} \
             --genomeDir {output} \
             --genomeFastaFiles {input.fa} \
-            --sjdbGTFfile {input.gtf} {params.gff} \--genomeSAindexNbases {params.genomeSAindexNbases}
+            --sjdbGTFfile {input.gtf} {params.gff} \
+            --genomeSAindexNbases {params.genomeSAindexNbases}
         """
 
 
