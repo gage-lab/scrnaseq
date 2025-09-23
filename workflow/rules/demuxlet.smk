@@ -7,12 +7,24 @@ rule install_popscle_helper_tools:
         """
 
 
-if "GeneFull" not in config["STARsolo"]["soloFeatures"]:
-    demux_barcodes = "{outdir}/map_count/{run}/outsGene/filtered/barcodes.tsv"
-    filtered_mtx = ("{outdir}/map_count/{run}/outsGene/filtered/matrix.mtx",)
+if config["use_CellBender"]:
+    if "GeneFull" not in config["STARsolo"]["soloFeatures"]:
+        demux_barcodes = "{outdir}/map_count/{run}/outsGene/cellbender/feature_bc_matrix_cell_barcodes.csv"
+        filtered_mtx = (
+            "{outdir}/map_count/{run}/outsGene/cellbender/feature_bc_matrix_filtered.h5",
+        )
+    else:
+        demux_barcodes = "{outdir}/map_count/{run}/outsGeneFull/cellbender/feature_bc_matrix_cell_barcodes.csv"
+        filtered_mtx = (
+            "{outdir}/map_count/{run}/outsGeneFull/cellbender/feature_bc_matrix_filtered.h5",
+        )
 else:
-    demux_barcodes = "{outdir}/map_count/{run}/outsGeneFull/filtered/barcodes.tsv"
-    filtered_mtx = ("{outdir}/map_count/{run}/outsGeneFull/filtered/matrix.mtx",)
+    if "GeneFull" not in config["STARsolo"]["soloFeatures"]:
+        demux_barcodes = "{outdir}/map_count/{run}/outsGene/filtered/barcodes.tsv"
+        filtered_mtx = ("{outdir}/map_count/{run}/outsGene/filtered/matrix.mtx",)
+    else:
+        demux_barcodes = "{outdir}/map_count/{run}/outsGeneFull/filtered/barcodes.tsv"
+        filtered_mtx = ("{outdir}/map_count/{run}/outsGeneFull/filtered/matrix.mtx",)
 
 
 rule prep_vcf:
@@ -21,9 +33,10 @@ rule prep_vcf:
         bam=rules.STARsolo.output.bam,
         vcf=config["genotypes"],
     output:
-        "{outdir}/demuxlet/{run}/genotypes.vcf",
+        tmpvcf=temp("{outdir}/demuxlet/{run}/genotypes.vcf.tmp"),
+        vcf="{outdir}/demuxlet/{run}/genotypes.vcf",
     conda:
-        "../envs/picard.yaml"
+        "../envs/demuxlet.yaml"
     log:
         "{outdir}/demuxlet/{run}/prep_vcf.log",
     params:
@@ -36,20 +49,15 @@ rule prep_vcf:
         source {input.tools}/filter_vcf_file_for_popscle.sh
         check_if_programs_exists
 
-        tmpvcf=$(mktemp)
-        trap 'rm -f $tmpvcf' EXIT
-
         # subset samples of interest
-        bcftools view -s {params.samples} -Ou {input.vcf} > $tmpvcf
+        bcftools view -s {params.samples} -Ou {input.vcf} > {output.tmpvcf}
 
-        {input.tools}/sort_vcf_same_as_bam.sh {input.bam} $tmpvcf \
+        {input.tools}/sort_vcf_same_as_bam.sh {input.bam} {output.tmpvcf} \
         | only_keep_snps \
         | calculate_AF_AC_AN_values_based_on_genotype_info \
         | filter_out_mutations_missing_genotype_for_one_or_more_samples \
         | filter_out_mutations_homozygous_reference_in_all_samples \
-        | filter_out_mutations_homozygous_in_all_samples > {output}
-
-        rm -f $tmpvcf
+        | filter_out_mutations_homozygous_in_all_samples > {output.vcf}
         """
 
 
@@ -58,7 +66,7 @@ rule filter_for_dsc_pileup:
         tools=rules.install_popscle_helper_tools.output,
         bam=rules.STARsolo.output.bam,
         barcodes=demux_barcodes,
-        vcf=rules.prep_vcf.output,
+        vcf=rules.prep_vcf.output.vcf,
     output:
         "{outdir}/demuxlet/{run}/filter_for_dsc_pileup.bam",
     conda:
@@ -74,7 +82,7 @@ rule dsc_pileup:
     input:
         bam=rules.filter_for_dsc_pileup.output,
         barcodes=demux_barcodes,
-        vcf=rules.prep_vcf.output,
+        vcf=rules.prep_vcf.output.vcf,
     output:
         "{outdir}/demuxlet/{run}/demultiplex.pileup.plp.gz",
     conda:
@@ -100,7 +108,7 @@ rule demuxlet:
     input:
         plp=rules.dsc_pileup.output,
         barcodes=demux_barcodes,
-        vcf=rules.prep_vcf.output,
+        vcf=rules.prep_vcf.output.vcf,
     output:
         "{outdir}/demuxlet/{run}/demutiplex.demuxlet.best",
     conda:

@@ -4,3 +4,6 @@ channels:
   - nodefaults
 dependencies:
   - popscle
+  - bedtools
+  - bcftools
+  - samtools
