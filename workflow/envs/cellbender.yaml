@@ -3,4 +3,6 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  - python=3.7
   - cellbender>=0.3.2
+  - webcolors<1.12

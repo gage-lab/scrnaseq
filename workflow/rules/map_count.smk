@@ -1,9 +1,14 @@
 # reindex genome for faster STAR alignment
+# get basename of fasta
+basename = Path(config["genome"]).stem
+index = Path("resources") / "STARsolo" / basename
+
+
 rule STARindex:
     input:
         **refdata,
     output:
-        directory("resources/STARsolo"),
+        directory(index),
     threads: 8
     conda:
         "../envs/star.yaml"
@@ -66,6 +71,7 @@ rule STARsolo:
         "../envs/star.yaml"
     params:
         soloFeatures=" ".join(config["STARsolo"]["soloFeatures"]),
+        chemistry=CHEMISTRY,
     log:
         multiext("{outdir}/map_count/{run}/Log", ".out", ".progress.out", ".final.out"),
     script:
@@ -137,6 +143,7 @@ rule CellBender:
         filtered="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_filtered.h5",
         pdf="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix.pdf",
         barcodes="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/feature_bc_matrix_cell_barcodes.csv",
+        checkpoint="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/ckpt.tar.gz",
     params:
         total_droplets_included=lambda wc: runs[runs["run_id"] == wc.run][
             "total_barcodes"
@@ -148,6 +155,12 @@ rule CellBender:
             if shutil.which("nvidia-smi")
             else "../envs/cellbender.yaml"
         )
+    log:
+        out="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/log.out",
+        err="{outdir}/map_count/{run}/outs{soloFeatures}/cellbender/log.err",
+    shadow:
+        "shallow"
+    threads: 16
     shell:
         """
         # use CUDA if GPU is present
@@ -158,6 +171,12 @@ rule CellBender:
         fi
         expected=$(wc -l {input.filtered} | tr ' ' '\n' | head -n 1)
 
+        if [ -f {output.checkpoint} ]; then
+            extra="--checkpoint {output.checkpoint}"
+        else
+            extra=""
+        fi
+
         # run cellbender
         mkdir -p $(dirname {output.raw})
         cellbender remove-background \
@@ -165,7 +184,9 @@ rule CellBender:
             --output {output.raw} \
             --epochs 300 \
             --learning-rate 0.00001 \
-            --z-dim 50 \
+            --cpu-threads {threads} \
+            --estimator-multiple-cpu \
             --expected-cells $expected \
-            --total-droplets-included {params.total_droplets_included} $cuda
+            --total-droplets-included {params.total_droplets_included} $cuda $extra > {log.out} 2> {log.err}
+        cp ckpt.tar.gz {output.checkpoint}
         """
