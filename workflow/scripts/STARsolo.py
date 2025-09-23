@@ -19,14 +19,17 @@ else:
 outdir = str(Path(snakemake.output.bam).parent) + "/"
 
 # set readFilesIn and solo10xProtocol
-print(f"10x chemistry: {snakemake.config['10x_chemistry']}")
-if snakemake.config["10x_chemistry"] == "5prime":
+print(f"10x chemistry: {snakemake.params.chemistry}")
+if snakemake.params.chemistry == "5prime":
     solo10xProtocol = "--soloBarcodeMate 1 --clip5pNbases 39 0 --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10"
     readFilesIn = f"--readFilesIn {r1} {r2}"
-elif snakemake.config["10x_chemistry"] == "3prime_v2":
-    solo10xProtocol = "--soloUMIlen 16 --clipAdapterType CellRanger4"
+elif snakemake.params.chemistry == "3prime_v2":
+    solo10xProtocol = "--soloUMIlen 10 --clipAdapterType CellRanger4"
     readFilesIn = f"--readFilesIn {r2} {r1}"
-elif snakemake.config["10x_chemistry"] == "3prime_v3":
+elif (
+    snakemake.params.chemistry == "3prime_v3"
+    or snakemake.params.chemistry == "3prime_v4"
+):
     solo10xProtocol = "--soloUMIlen 12 --clipAdapterType CellRanger4"
     readFilesIn = f"--readFilesIn {r2} {r1}"
 else:

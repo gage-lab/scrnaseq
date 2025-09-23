@@ -31,6 +31,7 @@ properties:
     description: 10x chemistry used
     enum:
       - 5prime
+      - 3prime_v4
       - 3prime_v3
       - 3prime_v2
   STARsolo:
